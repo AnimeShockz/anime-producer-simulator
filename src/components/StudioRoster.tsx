@@ -41,6 +41,7 @@ export default function StudioRoster({
     setIsDialogOpen(true);
   };
 
+  // ---------- 1️⃣ Sort studios ----------
   const sortedStudios = useMemo(() => {
     const list = [...studios];
     switch (sortOption) {
@@ -61,12 +62,16 @@ export default function StudioRoster({
     }
   }, [studios, sortOption]);
 
+  // ---------- 2️⃣ Keep only the top 10 ----------
+  const displayedStudios = useMemo(() => sortedStudios.slice(0, 10), [sortedStudios]);
+
+  // ---------- 3️⃣ Apply search ----------
   const filteredStudios = useMemo(() => {
-    if (!searchTerm) return sortedStudios;
-    return sortedStudios.filter((studio) =>
+    if (!searchTerm) return displayedStudios;
+    return displayedStudios.filter((studio) =>
       studio.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [sortedStudios, searchTerm]);
+  }, [displayedStudios, searchTerm]);
 
   return (
     <div className="flex flex-col h-full">

@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
+import { showSuccess } from "@/utils/toast";
 
 interface Props {
   value: string;
@@ -10,12 +9,10 @@ interface Props {
 }
 
 const BudgetSelector: React.FC<Props> = ({ value, onChange }) => {
-  const { toast } = useToast();
-
   const handleBudgetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newVal = event.target.value;
     onChange(newVal);
-    toast.success(`Budget selected: ${newVal}`);
+    showSuccess(`Budget selected: ${newVal}`);
   };
 
   return (

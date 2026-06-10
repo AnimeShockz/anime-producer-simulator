@@ -1,35 +1,3 @@
-// ... existing imports
-import { DarkModeToggle } from "@/components/DarkModeToggle";
-
-{/* Settings Dialog */}
-<Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-  <DialogContent className="space-y-4">
-    <DialogHeader>
-      <DialogTitle>{t("settings")}</DialogTitle>
-      <DialogDescription>{t("settings")}</DialogDescription>
-    </DialogHeader>
-
-    <Label className="flex items-center justify-between gap-4">
-      <span className="text-sm">{t("fullscreen")}</span>
-      <Switch checked={false} onCheckedChange={handleSettingsToggle} />
-    </Label>
-
-    {/* New dark‑mode toggle */}
-    <div className="flex items-center justify-between">
-      <span className="text-sm">Dark Mode</span>
-      <DarkModeToggle />
-    </div>
-
-    {/* ...rest of the dialog unchanged */}
-  </DialogContent>
-</Dialog>
-```
-
-### Result
-- Users can now switch between light and dark themes from the Settings dialog.
-- The choice is saved in `localStorage` and respected on subsequent visits.
-- All existing components automatically adapt thanks to Tailwind’s `dark:` utilities already present in the stylesheet.```tsx
-<dyad-write path="src/pages/Home.tsx" description="Add DarkModeToggle import and ensure the file compiles after insertion">
 "use client";
 
 import React, { useState } from "react";
@@ -60,29 +28,21 @@ import { DarkModeToggle } from "@/components/DarkModeToggle";
 const SAVE_SLOT_COUNT = 3;
 const slotKey = (i: number) => `anime-producer-save-slot-${i}`;
 
-const Home = () => {
+const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const { t } = useT();
+  const { language, setLanguage } = useLanguage();
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoadOpen, setIsLoadOpen] = useState(false);
-  const navigate = useNavigate();
-
-  // Settings state
   const [soundVolume, setSoundVolume] = useState(50);
-  const { language, setLanguage } = useLanguage();
-  const { t } = useT();
 
   const handleCreateNewGame = () => {
-    // Clear any existing save slots
+    // clear any existing save slots
     for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
       localStorage.removeItem(slotKey(i));
     }
-
-    // Try React Router navigation first
-    try {
-      navigate("/game");
-    } catch {
-      // Fallback for environments where navigate may not work (e.g., during tests)
-      window.location.hash = "#/game";
-    }
+    navigate("/game");
   };
 
   const openLoadDialog = () => setIsLoadOpen(true);
@@ -178,7 +138,7 @@ const Home = () => {
                 max={100}
                 step={1}
                 value={soundVolume}
-                onValueChange={(val) => setSoundVolume(val)}
+                onValueChange={(val) => setSoundVolume(val as number)}
               />
               <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
             </div>

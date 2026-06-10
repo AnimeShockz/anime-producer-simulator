@@ -37,7 +37,7 @@ const Game: React.FC = () => {
     showSuccess(
       `Produced ${selectedManga.title} with ${selectedStudio.name} on a ${selectedBudget} budget (Lang: ${language}, Vol: ${volume}%)`,
     );
-    toast.toast({
+    toast({
       title: "Production started",
       description: `${selectedManga.title} is now in production!`,
     });

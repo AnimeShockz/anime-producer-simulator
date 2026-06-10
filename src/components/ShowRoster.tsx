@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Manga } from "@/data/manga";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -44,8 +43,16 @@ export default function ShowRoster({
   season,
   onSelectManga
 }: ShowRosterProps) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailManga, setDetailManga] = useState<Manga | null>(null);
+
+  const filteredManga = useMemo(() => {
+    if (!searchTerm) return mangaList;
+    return mangaList.filter(manga => 
+      manga.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [mangaList, searchTerm]);
 
   const handleSelect = (manga: Manga) => {
     onSelectManga(manga);
@@ -66,24 +73,38 @@ export default function ShowRoster({
         </span>
       </div>
 
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search manga..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full"
+        />
+      </div>
+
       <ScrollArea className="max-h-[430px] pr-4">
         <div className="space-y-3">
-          {mangaList.map((manga) => (
-            <Card
-              key={manga.id}
-              className={`cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${
-                selectedManga?.id === manga.id ? "ring-2 ring-primary" : ""
-              }`}
-              onClick={() => openDetailDialog(manga)}
-            >
-              <CardContent className="py-4">
-                <h3 className="font-semibold text-base leading-tight">{manga.title}</h3>
-                <p className="mt-1 text-sm text-slate-600">
-                  Popularity: <span className="font-semibold text-slate-900">{manga.popularity}%</span>
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {filteredManga.length === 0 ? (
+            <p className="text-sm text-slate-500 text-center py-4">No manga found</p>
+          ) : (
+            filteredManga.map((manga) => (
+              <Card
+                key={manga.id}
+                className={`cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                  selectedManga?.id === manga.id ? "ring-2 ring-primary" : ""
+                }`}
+                onClick={() => openDetailDialog(manga)}
+              >
+                <CardContent className="py-4">
+                  <h3 className="font-semibold text-base leading-tight">{manga.title}</h3>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Popularity: <span className="font-semibold text-slate-900">{manga.popularity}%</span>
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </ScrollArea>
 

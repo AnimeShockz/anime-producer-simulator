@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Studio } from "@/data/studios";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface StudioRosterProps {
@@ -14,8 +15,16 @@ interface StudioRosterProps {
 }
 
 export default function StudioRoster({ studios, selectedStudio, onSelectStudio }: StudioRosterProps) {
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [detailStudio, setDetailStudio] = React.useState<Studio | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [detailStudio, setDetailStudio] = useState<Studio | null>(null);
+
+  const filteredStudios = useMemo(() => {
+    if (!searchTerm) return studios;
+    return studios.filter(studio => 
+      studio.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [studios, searchTerm]);
 
   const handleSelect = (studio: Studio) => {
     onSelectStudio(studio);
@@ -30,24 +39,39 @@ export default function StudioRoster({ studios, selectedStudio, onSelectStudio }
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-lg font-semibold mb-4">Select Studio</h2>
+      
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search studios..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full"
+        />
+      </div>
+      
       <ScrollArea className="flex-1">
         <div className="space-y-3 pr-4">
-          {studios.map((studio) => (
-            <Card
-              key={studio.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedStudio?.id === studio.id ? "ring-2 ring-primary" : ""
-              }`}
-              onClick={() => openDetailDialog(studio)}
-            >
-              <CardContent className="pt-4">
-                <h3 className="font-medium text-base">{studio.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Min Budget: <span className="font-semibold">{studio.minBudget}</span>
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {filteredStudios.length === 0 ? (
+            <p className="text-sm text-slate-500 text-center py-4">No studios found</p>
+          ) : (
+            filteredStudios.map((studio) => (
+              <Card
+                key={studio.id}
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  selectedStudio?.id === studio.id ? "ring-2 ring-primary" : ""
+                }`}
+                onClick={() => openDetailDialog(studio)}
+              >
+                <CardContent className="pt-4">
+                  <h3 className="font-medium text-base">{studio.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Min Budget: <span className="font-semibold">{studio.minBudget}</span>
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </ScrollArea>
 

@@ -19,6 +19,14 @@ import { Manga } from "@/data/manga";
 import { BudgetLevel } from "@/data/studios";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -130,6 +138,10 @@ const Game = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [episodeCount, setEpisodeCount] = useState(initialState.episodeCount);
 
+  // New settings state
+  const [soundVolume, setSoundVolume] = useState(50);
+  const [language, setLanguage] = useState("English");
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -226,7 +238,7 @@ const Game = () => {
   };
 
   const handleSettingsToggle = (checked: boolean) => {
-    console.log("Settings toggle:", checked);
+    console.log("Fullscreen toggle:", checked);
   };
 
   const handleExitToMainMenu = () => {
@@ -333,8 +345,7 @@ const Game = () => {
               <div className="space-y-4">
                 <div className="grid gap-3 md:grid-cols-2 text-sm">
                   <div>
-                    <span className="font-medium">Budget:</span>{" "}
-                    {state.budget}
+                    <span className="font-medium">Budget:</span> {state.budget}
                   </div>
                   <div>
                     <span className="font-medium">Rights Purchased:</span>{" "}
@@ -380,23 +391,59 @@ const Game = () => {
           </Dialog>
         )}
 
+        {/* Settings dialog with sound slider and language dropdown */}
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md space-y-4">
             <DialogHeader>
               <DialogTitle>Game Settings</DialogTitle>
-              <DialogDescription>
-                Toggle basic game preferences.
-              </DialogDescription>
+              <DialogDescription>Toggle basic game preferences.</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <Label className="flex items-center justify-between gap-4">
-                <span className="text-sm">Fullscreen</span>
-                <Switch
-                  checked={false}
-                  onCheckedChange={handleSettingsToggle}
-                />
-              </Label>
+            {/* Fullscreen toggle */}
+            <Label className="flex items-center justify-between gap-4">
+              <span className="text-sm">Fullscreen</span>
+              <Switch checked={false} onCheckedChange={handleSettingsToggle} />
+            </Label>
+
+            {/* Sound volume slider */}
+            <div>
+              <Label className="block mb-2 text-sm font-medium">Sound Volume</Label>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[soundVolume]}
+                onValueChange={(val) => setSoundVolume(val[0])}
+              />
+              <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
+            </div>
+
+            {/* Language dropdown */}
+            <div>
+              <Label className="block mb-2 text-sm font-medium">Language</Label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[
+                    "English",
+                    "Japanese",
+                    "Korean",
+                    "Chinese",
+                    "Spanish",
+                    "French",
+                    "German",
+                    "Italian",
+                    "Portuguese",
+                    "Russian",
+                  ].map((lang) => (
+                    <SelectItem key={lang} value={lang}>
+                      {lang}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </DialogContent>
         </Dialog>

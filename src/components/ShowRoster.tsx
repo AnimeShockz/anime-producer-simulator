@@ -44,15 +44,9 @@ export default function ShowRoster({
   onSelectManga
 }: ShowRosterProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState<"popularity" | "title" | "chapters" | "tankobon" = "popularity";
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailManga, setDetailManga] = useState<Manga | null>(null);
-
-  const filteredManga = useMemo(() => {
-    if (!searchTerm) return mangaList;
-    return mangaList.filter(manga => 
-      manga.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [mangaList, searchTerm]);
 
   const handleSelect = (manga: Manga) => {
     onSelectManga(manga);
@@ -64,6 +58,30 @@ export default function ShowRoster({
     setIsDialogOpen(true);
   };
 
+  // Sort the list based on the selected option
+  const sortedManga = useMemo(() => {
+    const list = [...mangaList];
+    switch (sortOption) {
+      case "popularity":
+        return list.sort((a, b) => b.popularity - a.popularity);
+      case "title":
+        return list.sort((a, b) => a.title.localeCompare(b.title));
+      case "chapters":
+        return list.sort((a, b) => a.chapters - b.chapters);
+      case "tankobon":
+        return list.sort((a, b) => a.tankobonVolumes - b.tankobonVolumes);
+      default:
+        return list;
+    }
+  }, [mangaList, sortOption]);
+
+  const filteredManga = useMemo(() => {
+    if (!searchTerm) return sortedManga;
+    return sortedManga.filter(manga =>
+      manga.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [sortedManga, searchTerm]);
+
   return (
     <div className="flex h-full flex-col">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -73,14 +91,26 @@ export default function ShowRoster({
         </span>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex gap-2">
         <Input
           type="text"
           placeholder="Search manga..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
+          className="w-3/4"
         />
+        <Button
+          variant="outline"
+          className="px-3"
+          onClick={() => {
+            const options = ["popularity", "title", "chapters", "tankobon"] as const;
+            const currentIndex = options.indexOf(sortOption);
+            const nextIndex = (options.indexOf(sortOption) + 1) % options.length;
+            setSortOption(options[nextIndex]);
+          }}
+        >
+          {sortOption}
+        </Button>
       </div>
 
       <ScrollArea className="max-h-[430px] pr-4">
@@ -104,7 +134,7 @@ export default function ShowRoster({
                 </CardContent>
               </Card>
             ))
-          )}
+          }
         </div>
       </ScrollArea>
 

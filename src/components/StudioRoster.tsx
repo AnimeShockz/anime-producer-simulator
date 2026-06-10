@@ -16,15 +16,48 @@ interface StudioRosterProps {
 
 export default function StudioRoster({ studios, selectedStudio, onSelectStudio }: StudioRosterProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState<"popularity" | "name" | "size" = "popularity";
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailStudio, setDetailStudio] = useState<Studio | null>(null);
 
+  const handleSelect = (studio: Studio) => {
+    onSelectStudio(studio);
+    setIsDialogOpen(false);
+  };
+
+  const openDetailDialog = (studio: Studio) => {
+    setDetailStudio(studio);
+    setIsDialogOpen(true);
+  };
+
+  // Sort the list based on the selected option
+  const sortedStudios = useMemo(() => {
+    const list = [...studios];
+    switch (sortOption) {
+      case "popularity":
+        return list.sort((a, b) => b.popularity - a.popularity);
+      case "name":
+        return list.sort((a, b) => a.name.localeCompare(b.name));
+      case "size":
+        const sizeOrder: Record<Studio["size"], number> = {
+          indie: 0,
+          small: 1,
+          medium: 2,
+          large: 3,
+          massive: 4,
+        };
+        return list.sort((a, b) => sizeOrder[a.size] - sizeOrder[b.size]);
+      default:
+        return list;
+    }
+  }, [studios, sortOption]);
+
   const filteredStudios = useMemo(() => {
-    if (!searchTerm) return studios;
-    return studios.filter(studio => 
+    if (!searchTerm) return sortedStudios;
+    return sortedStudios.filter(studio =>
       studio.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [studios, searchTerm]);
+  }, [sortedStudios, searchTerm]);
 
   const handleSelect = (studio: Studio) => {
     onSelectStudio(studio);
@@ -40,14 +73,28 @@ export default function StudioRoster({ studios, selectedStudio, onSelectStudio }
     <div className="flex flex-col h-full">
       <h2 className="text-lg font-semibold mb-4">Select Studio</h2>
       
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col">
         <Input
           type="text"
           placeholder="Search studios..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
+          className="w-full mb-2"
         />
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="px-3"
+            onClick={() => {
+              const options = ["popularity", "name", "size"] as const;
+              const currentIndex = options.indexOf(sortOption);
+              const nextIndex = (options.indexOf(sortOption) + 1) % options.length;
+              setSortOption(options[nextIndex]);
+            }}
+          >
+            {sortOption}
+          </Button>
+        </div>
       </div>
       
       <ScrollArea className="flex-1">

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom"; // ← use React Router instead of next/navigation
 import MangaCard from "@/components/MangaCard";
 import StudioCard from "@/components/StudioCard";
 import BudgetSelector from "@/components/BudgetSelector";
@@ -148,7 +148,7 @@ export default function Simulator() {
   const [language, setLanguage] = useState<string>("English");
   const [volume, setVolume] = useState<number>(50);
   const { toast } = useToast();
-  const router = useRouter();
+  const navigate = useNavigate(); // ← React Router navigation
 
   const isEligible =
     selectedStudio &&
@@ -161,7 +161,7 @@ export default function Simulator() {
     toast.success(
       `Produced ${selectedManga?.title} with ${selectedStudio} on ${selectedBudget} budget (Lang: ${language}, Vol: ${volume}%)`,
     );
-    router.push("/simulator/result");
+    navigate("/simulator/result"); // ← navigate to result page
   };
 
   if (!selectedManga || !selectedStudio || !selectedBudget) {
@@ -209,7 +209,7 @@ export default function Simulator() {
             />
           </div>
 
-          {/* Language dropdown using shadcn Select */}
+          {/* Language dropdown */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-800">
               Language
@@ -239,7 +239,7 @@ export default function Simulator() {
             </Select>
           </div>
 
-          {/* Volume slider using shadcn Slider */}
+          {/* Volume slider */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-800">
               Volume
@@ -252,9 +252,7 @@ export default function Simulator() {
               onValueChange={(val) => setVolume(val[0])}
               className="w-full"
             />
-            <p className="mt-2 text-sm text-gray-600">
-              {volume}%
-            </p>
+            <p className="mt-2 text-sm text-gray-600">{volume}%</p>
           </div>
         </div>
 

@@ -38,10 +38,18 @@ const Home = () => {
   const { t } = useT();
 
   const handleCreateNewGame = () => {
+    // Clear any existing save slots
     for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
       localStorage.removeItem(slotKey(i));
     }
-    navigate("/game");
+
+    // Try React Router navigation first
+    try {
+      navigate("/game");
+    } catch {
+      // Fallback for environments where navigate may not work (e.g., during tests)
+      window.location.hash = "#/game";
+    }
   };
 
   const openLoadDialog = () => setIsLoadOpen(true);

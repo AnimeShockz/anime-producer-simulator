@@ -14,6 +14,13 @@ import { Manga } from "@/data/manga";
 import { Studio } from "@/data/studios";
 import { showSuccess } from "@/utils/toast";
 
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
+
 const Game: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,37 +52,46 @@ const Game: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-      {/* Manga roster */}
-      <div className="lg:col-span-1">
+    <Tabs defaultValue="manga" className="w-full">
+      {/* Tab headers */}
+      <TabsList className="grid w-full grid-cols-3 mb-4">
+        <TabsTrigger value="manga">Manga</TabsTrigger>
+        <TabsTrigger value="studio">Studio</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
+      </TabsList>
+
+      {/* Manga roster tab */}
+      <TabsContent value="manga">
         <ShowRoster
           mangaList={mangaList}
           selectedManga={selectedManga}
           season={1}
           onSelectManga={setSelectedManga}
         />
-      </div>
+      </TabsContent>
 
-      {/* Studio roster */}
-      <div className="lg:col-span-1">
+      {/* Studio roster tab */}
+      <TabsContent value="studio">
         <StudioRoster
           studios={studios}
           selectedStudio={selectedStudio}
           onSelectStudio={setSelectedStudio}
         />
-      </div>
+      </TabsContent>
 
-      {/* Controls & produce */}
-      <div className="flex flex-col gap-4 lg:col-span-1">
+      {/* Settings tab – budget, studio selector, produce button */}
+      <TabsContent value="settings" className="space-y-4">
         <BudgetSelector value={selectedBudget} onChange={setSelectedBudget} />
         <StudioSelector
           value={selectedStudio?.id ?? ""}
-          onChange={(id) => setSelectedStudio(studios.find((s) => s.id === id) ?? null)}
+          onChange={(id) =>
+            setSelectedStudio(studios.find((s) => s.id === id) ?? null)
+          }
           studios={studios.map((s) => ({ id: s.id, name: s.name }))}
         />
         <ProduceButton isEligible={!!isEligible} onProduce={handleProduce} />
-      </div>
-    </div>
+      </TabsContent>
+    </Tabs>
   );
 };
 

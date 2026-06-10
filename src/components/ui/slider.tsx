@@ -3,7 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-type SliderProps = React.HTMLAttributes<HTMLDivElement> & {
+type SliderProps = React.InputHTMLAttributes<HTMLInputElement> & {
   /** Current value */
   value?: number;
   /** Minimum value (default 0) */
@@ -16,7 +16,7 @@ type SliderProps = React.HTMLAttributes<HTMLDivElement> & {
   onValueChange?: (val: number) => void;
 };
 
-export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
+export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   (
     {
       className,
@@ -29,36 +29,28 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     },
     ref,
   ) => {
-    // Simple visual representation – not a fully functional slider,
-    // but enough for type‑checking and basic UI.
-    const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
-
-    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!onValueChange) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickPos = e.clientX - rect.left;
-      const newPercent = clickPos / rect.width;
-      const newValue = Math.round(min + newPercent * (max - min));
-      // Snap to nearest step
-      const stepped = Math.round(newValue / step) * step;
-      onValueChange(stepped);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newVal = Number(e.target.value);
+      onValueChange?.(newVal);
     };
 
     return (
-      <div
+      <input
+        type="range"
         ref={ref}
         className={cn(
-          "relative flex w-full touch-none select-none items-center",
+          "w-full h-2 bg-muted rounded-full appearance-none cursor-pointer",
+          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+          "thumb:w-5 thumb:h-5 thumb:rounded-full thumb:bg-primary thumb:shadow-md",
           className,
         )}
-        onClick={handleClick}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={handleChange}
         {...props}
-      >
-        <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-muted">
-          <div className="absolute h-full bg-primary" style={{ width: `${percent}%` }} />
-        </div>
-        <div className="block h-5 w-5 rounded-full bg-primary shadow-md" />
-      </div>
+      />
     );
   },
 );

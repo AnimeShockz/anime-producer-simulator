@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
-import { toast as sonnerToast } from "sonner"; // <-- added import
+import { toast as sonnerToast } from "sonner";
+import { mangaList } from "@/data/manga"; // <-- added import
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -48,8 +49,16 @@ type GameState = {
   rightsPurchased: boolean;
 };
 
+// Seed with first 5 manga entries
+const initialFranchises: Franchise[] = mangaList.slice(0, 5).map((manga) => ({
+  manga,
+  adapted: false,
+  review: null,
+  episodeCount: 12,
+}));
+
 const initialState: GameState = {
-  franchises: [],
+  franchises: initialFranchises,
   currentFranchiseId: null,
   budget: "average",
   episodeCount: 12,

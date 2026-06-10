@@ -1,5 +1,13 @@
-import * as AspectRatioPrimitive from "@radix-ui/react-aspect-ratio";
+"use client";
 
-const AspectRatio = AspectRatioPrimitive.Root;
+import * as React from "react";
 
-export { AspectRatio };
+export const AspectRatio = ({
+  ratio = 1,
+  children,
+}: {
+  ratio?: number;
+  children: React.ReactNode;
+}) => (
+  <div style={{ position: "relative", paddingBottom: `${100 / ratio}%` }}>{children}</div>
+);

@@ -24,7 +24,10 @@ export const DialogContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Content
     ref={ref}
-    className={cn("fixed left-1/2 top-1/2 max-w-lg w-full -translate-x-1/2 -translate-y-1/2 rounded-lg bg-background p-6 shadow-lg", className)}
+    className={cn(
+      "fixed left-1/2 top-1/2 max-w-lg w-full -translate-x-1/2 -translate-y-1/2 rounded-lg bg-background p-6 shadow-lg",
+      className,
+    )}
     {...props}
   />
 ));
@@ -32,3 +35,8 @@ DialogContent.displayName = "DialogContent";
 
 export const DialogTitle = DialogPrimitive.Title;
 export const DialogDescription = DialogPrimitive.Description;
+
+export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+);
+DialogHeader.displayName = "DialogHeader";

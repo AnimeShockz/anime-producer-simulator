@@ -10,7 +10,7 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
 };
 
-const buttonVariants = ({
+export const buttonVariants = ({
   variant = "default",
   size = "default",
 }: { variant: ButtonProps["variant"]; size: ButtonProps["size"] }) => {

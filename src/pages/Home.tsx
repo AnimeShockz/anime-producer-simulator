@@ -54,9 +54,6 @@ const Home = () => {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-slate-950">{t("title")}</h1>
           <p className="text-sm text-slate-600">{t("tagline")}</p>
-          <p className="text-sm text-slate-600">
-            {t("currentLanguage")} <span className="font-medium">{language}</span>
-          </p>
         </div>
 
         <div className="flex flex-col space-y-3">
@@ -116,7 +113,7 @@ const Home = () => {
                 <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
               </div>
 
-              {/* Language dropdown */}
+              {/* Language dropdown with native names */}
               <div>
                 <Label className="block mb-2 text-sm font-medium">{t("language")}</Label>
                 <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
@@ -124,22 +121,16 @@ const Home = () => {
                     <SelectValue placeholder={t("language")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {[
-                      "English",
-                      "Japanese",
-                      "Korean",
-                      "Chinese",
-                      "Spanish",
-                      "French",
-                      "German",
-                      "Italian",
-                      "Portuguese",
-                      "Russian",
-                    ].map((lang) => (
-                      <SelectItem key={lang} value={lang}>
-                        {lang}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="English">English</SelectItem>
+                    <SelectItem value="Japanese">日本語</SelectItem>
+                    <SelectItem value="Korean">한국어</SelectItem>
+                    <SelectItem value="Chinese">中文</SelectItem>
+                    <SelectItem value="Spanish">Español</SelectItem>
+                    <SelectItem value="French">Français</SelectItem>
+                    <SelectItem value="German">Deutsch</SelectItem>
+                    <SelectItem value="Italian">Italiano</SelectItem>
+                    <SelectItem value="Portuguese">Português</SelectItem>
+                    <SelectItem value="Russian">Русский</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

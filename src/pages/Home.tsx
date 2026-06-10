@@ -22,9 +22,14 @@ import {
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
+import { Trash2 } from "lucide-react";
+
+const SAVE_SLOT_COUNT = 3;
+const slotKey = (i: number) => `anime-producer-save-slot-${i}`;
 
 const Home = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLoadOpen, setIsLoadOpen] = useState(false);
   const navigate = useNavigate();
 
   // Settings state
@@ -33,11 +38,35 @@ const Home = () => {
   const { t } = useT();
 
   const handleCreateNewGame = () => {
+    // clear all slots for a fresh start
+    for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
+      localStorage.removeItem(slotKey(i));
+    }
     navigate("/game");
   };
 
-  const handleLoadSave = () => {
-    alert("Load Save functionality is handled in the game page.");
+  const openLoadDialog = () => {
+    setIsLoadOpen(true);
+  };
+
+  const loadFromSlot = (i: number) => {
+    const data = localStorage.getItem(slotKey(i));
+    if (data) {
+      localStorage.setItem("anime-producer-save", data); // main key used by Game
+      navigate("/game");
+    } else {
+      alert("Slot is empty.");
+    }
+    setIsLoadOpen(false);
+  };
+
+  const deleteSlot = (i: number) => {
+    if (confirm(`Delete save in slot ${i}? This cannot be undone.`)) {
+      localStorage.removeItem(slotKey(i));
+      // force re‑render
+      setIsLoadOpen(false);
+      setTimeout(() => setIsLoadOpen(true), 0);
+    }
   };
 
   const handleExitToWindows = () => {
@@ -62,7 +91,7 @@ const Home = () => {
           </Button>
 
           <Button
-            onClick={handleLoadSave}
+            onClick={openLoadDialog}
             className="w-full justify-center"
             variant="secondary"
           >
@@ -86,6 +115,7 @@ const Home = () => {
           </Button>
         </div>
 
+        {/* Settings Dialog */}
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
           <DialogContent className="space-y-4">
             <DialogHeader>
@@ -93,47 +123,80 @@ const Home = () => {
               <DialogDescription>{t("settings")}</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              {/* Fullscreen toggle */}
-              <Label className="flex items-center justify-between gap-4">
-                <span className="text-sm">{t("fullscreen")}</span>
-                <Switch checked={false} onCheckedChange={handleSettingsToggle} />
-              </Label>
+            <Label className="flex items-center justify-between gap-4">
+              <span className="text-sm">{t("fullscreen")}</span>
+              <Switch checked={false} onCheckedChange={handleSettingsToggle} />
+            </Label>
 
-              {/* Sound volume slider */}
-              <div>
-                <Label className="block mb-2 text-sm font-medium">{t("soundVolume")}</Label>
-                <Slider
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={[soundVolume]}
-                  onValueChange={(val) => setSoundVolume(val[0])}
-                />
-                <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
-              </div>
+            <div>
+              <Label className="block mb-2 text-sm font-medium">{t("soundVolume")}</Label>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[soundVolume]}
+                onValueChange={(val) => setSoundVolume(val[0])}
+              />
+              <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
+            </div>
 
-              {/* Language dropdown with native names */}
-              <div>
-                <Label className="block mb-2 text-sm font-medium">{t("language")}</Label>
-                <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("language")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Japanese">日本語</SelectItem>
-                    <SelectItem value="Korean">한국어</SelectItem>
-                    <SelectItem value="Chinese">中文</SelectItem>
-                    <SelectItem value="Spanish">Español</SelectItem>
-                    <SelectItem value="French">Français</SelectItem>
-                    <SelectItem value="German">Deutsch</SelectItem>
-                    <SelectItem value="Italian">Italiano</SelectItem>
-                    <SelectItem value="Portuguese">Português</SelectItem>
-                    <SelectItem value="Russian">Русский</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <Label className="block mb-2 text-sm font-medium">{t("language")}</Label>
+              <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("language")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="Japanese">日本語</SelectItem>
+                  <SelectItem value="Korean">한국어</SelectItem>
+                  <SelectItem value="Chinese">中文</SelectItem>
+                  <SelectItem value="Spanish">Español</SelectItem>
+                  <SelectItem value="French">Français</SelectItem>
+                  <SelectItem value="German">Deutsch</SelectItem>
+                  <SelectItem value="Italian">Italiano</SelectItem>
+                  <SelectItem value="Portuguese">Português</SelectItem>
+                  <SelectItem value="Russian">Русский</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Load Save Dialog */}
+        <Dialog open={isLoadOpen} onOpenChange={setIsLoadOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("loadSave")}</DialogTitle>
+              <DialogDescription>Select a slot to load.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              {[...Array(SAVE_SLOT_COUNT)].map((_, idx) => {
+                const slot = idx + 1;
+                const data = localStorage.getItem(slotKey(slot));
+                const isEmpty = !data;
+                return (
+                  <div key={slot} className="flex items-center justify-between">
+                    <Button
+                      className="flex-1 justify-between"
+                      onClick={() => loadFromSlot(slot)}
+                    >
+                      Slot {slot} {isEmpty ? "— Empty" : "— Saved"}
+                    </Button>
+                    {!isEmpty && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteSlot(slot)}
+                        className="ml-2"
+                        aria-label={`Delete slot ${slot}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>

@@ -1,41 +1,49 @@
 "use client";
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 
 const Home = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const handleCreateNewGame = () => {
-    router.push("/game");
+    navigate("/game");
   };
 
   const handleLoadSave = () => {
-    // Loading logic would be implemented in the game page
-    alert("Load Save functionality will be implemented in the game.");
+    alert("Load Save functionality is handled in the game page.");
   };
 
   const handleExitToWindows = () => {
-    // In a real app this would terminate the game
-    alert("Exit to Windows clicked");
+    alert("Exit to Windows clicked.");
   };
 
-  const handleSettingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Currently just logs the change; actual settings handled in dialog
-    console.log("Settings toggle:", e.target.value);
+  const handleSettingsChange = (checked: boolean) => {
+    console.log("Settings toggle:", checked);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="rounded-2xl bg-white p-8 shadow-lg w-full max-w-2xl space-y-6">
-        <h1 className="text-4xl font-bold text-center text-gray-800">
-          Anime Producer Simulator
-        </h1>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-slate-950">
+            Anime Producer Simulator
+          </h1>
+          <p className="text-sm text-slate-600">
+            Build your anime season, choose studios, and review the results.
+          </p>
+        </div>
 
         <div className="flex flex-col space-y-3">
           <Button
@@ -47,52 +55,61 @@ const Home = () => {
 
           <Button
             onClick={handleLoadSave}
-            className="w-full justify-center bg-blue-50"
+            className="w-full justify-center"
+            variant="secondary"
           >
             Load Save
           </Button>
 
-          <Button            onClick={() => setIsSettingsOpen(true)}
-            className="w-full justify-center bg-purple-50"
+          <Button
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-full justify-center"
+            variant="outline"
           >
             Settings
           </Button>
 
           <Button
             onClick={handleExitToWindows}
-            className="w-full justify-center bg-red-50"
+            className="w-full justify-center"
+            variant="destructive"
           >
             Exit to Windows
           </Button>
         </div>
 
-        {/* Settings Dialog */}
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-          <DialogHeader>
-            <DialogTitle>Game Settings</DialogTitle>
-          </DialogHeader>
           <DialogContent className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Label className="flex items-center space-x-2">
+            <DialogHeader>
+              <DialogTitle>Game Settings</DialogTitle>
+              <DialogDescription>
+                Toggle basic game preferences.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Fullscreen</span>
                 <Switch
                   checked={false}
                   onCheckedChange={handleSettingsChange}
                 />
-                <span className="text-sm text-slate-600">Fullscreen</span>
               </Label>
-              <Label className="flex items-center space-x-2">
+
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Mute Audio</span>
                 <Switch
                   checked={false}
                   onCheckedChange={handleSettingsChange}
                 />
-                <span className="text-sm text-slate-600">Mute Audio</span>
               </Label>
-              <Label className="flex items-center space-x-2">
+
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Language</span>
                 <Switch
                   checked={false}
                   onCheckedChange={handleSettingsChange}
                 />
-                <span className="text-sm text-slate-600">Language</span>
               </Label>
             </div>
           </DialogContent>

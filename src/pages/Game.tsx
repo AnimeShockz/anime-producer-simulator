@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -16,17 +14,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Manga } from "@/data/manga";
-import { Studio } from "@/data/studios";
 import { BudgetLevel } from "@/data/studios";
 import { useToast } from "@/components/ui/toast";
-import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-
-const router = useRouter();
-const { toast } = useToast();
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -37,13 +29,15 @@ type Franchise = {
   episodeCount: number;
 };
 
-const initialState: {
+type GameState = {
   franchises: Franchise[];
   currentFranchiseId: string | null;
   budget: BudgetLevel;
   episodeCount: number;
   rightsPurchased: boolean;
-} = {
+};
+
+const initialState: GameState = {
   franchises: [],
   currentFranchiseId: null,
   budget: "average",
@@ -51,289 +45,377 @@ const initialState: {
   rightsPurchased: false,
 };
 
+const tabOptions = ["toAdapt", "adapted", "allAdapted"] as const;
+type TabOption = (typeof tabOptions)[number];
+
+const tabLabels: Record<TabOption, string> = {
+  toAdapt: "To Adapt",
+  adapted: "Adapted",
+  allAdapted: "All Adapted",
+};
+
 const HomepageTabs = ({
   tab,
   setTab,
 }: {
-  tab: string;
-  setTab: (tab: string) => void;
+  tab: TabOption;
+  setTab: (tab: TabOption) => void;
 }) => (
-  <div className="flex gap-2">
-    {[("toAdapt", "adapted", "allAdapted") as const].map((t) => (
+  <div className="flex flex-wrap justify-center gap-2">
+    {tabOptions.map((tabId) => (
       <Button
-        key={t}
-        variant={t === tab ? "default" : "outline"}
-        onClick={() => setTab(t)}
+        key={tabId}
+        variant={tabId === tab ? "default" : "outline"}
+        onClick={() => setTab(tabId)}
       >
-        {t.charAt(0).toUpperCase() + t.slice(1)}
+        {tabLabels[tabId]}
       </Button>
     ))}
   </div>
 );
 
-const Game = () => {
-  const [state, setState, removeState] = useLocalStorage(
-    STORAGE_KEY,
-    initialState
+const generateReview = (
+  manga: Manga,
+  franchise: Pick<Franchise, "episodeCount">,
+) => {
+  const score = Math.min(
+    10,
+    Math.max(0, Math.round(manga.popularity / 10 + franchise.episodeCount / 24)),
   );
-  const [selectedTab, setSelectedTab] = useState("toAdapt");
+
+  const scoreMap: Record<number, string> = {
+    0: "Abysmal",
+    1: "Terrible",
+    2: "Poor",
+    3: "Below Average",
+    4: "Average",
+    5: "Decent",
+    6: "Good",
+    7: "Very Good",
+    8: "Great",
+    9: "Excellent",
+    10: "Masterpiece",
+  };
+
+  const rating = scoreMap[score];
+  const salesUnits = manga.salesVolumes.toLocaleString();
+  const streamingRevenue = (manga.popularity * 10000).toLocaleString();
+
+  return [
+    `AI Critic Review: ${rating} (${score}/10)`,
+    "",
+    `Source Material: ${manga.title} (${manga.status}, ${manga.chapters} chapters, ${manga.tankobonVolumes} tankobon volumes)`,
+    `Episode Count: ${franchise.episodeCount}`,
+    `Popularity: ${manga.popularity}%`,
+    `Physical Media Sales: ${salesUnits} units`,
+    `Streaming Revenue: $${streamingRevenue}`,
+    `Verdict: ${
+      score >= 9
+        ? "A breakout hit that redefined the franchise."
+        : score >= 7
+          ? "A strong adaptation with clear audience appeal."
+          : "A solid adaptation that captured part of the source material."
+    }`,
+  ].join("\n");
+};
+
+const Game = () => {
+  const [state, setState] = useLocalStorage<GameState>(
+    STORAGE_KEY,
+    initialState,
+  );
+  const [selectedTab, setSelectedTab] = useState<TabOption>("toAdapt");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newManga, setNewManga] = useState<Manga | null>(null);
+  const [episodeCount, setEpisodeCount] = useState(initialState.episodeCount);
 
-  const { episodeCount, setEpisodeCount } = useState(12);
-
-  const filteredManga = useMemo(() => {
-    if (!searchTerm) return state.franchises.map((f) => f.manga);
-    return state.franchises
-      .filter((f) => f.manga.title.toLowerCase().includes(searchTerm.toLowerCase()))
-      .map((f) => f.manga);
-  }, [searchTerm, state.franchises]);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const currentFranchise = useMemo(() => {
     if (!state.currentFranchiseId) return null;
-    return state.franchises.find((f) => f.manga.id === state.currentFranchiseId);
+    return state.franchises.find(
+      (franchise) => franchise.manga.id === state.currentFranchiseId,
+    );
   }, [state.currentFranchiseId, state.franchises]);
 
+  const tabs = useMemo(() => {
+    return [
+      {
+        id: "toAdapt",
+        label: "To Adapt",
+        franchises: state.franchises.filter((franchise) => !franchise.adapted),
+      },
+      {
+        id: "adapted",
+        label: "Adapted",
+        franchises: state.franchises.filter((franchise) => franchise.adapted),
+      },
+      {
+        id: "allAdapted",
+        label: "All Adapted",
+        franchises: state.franchises,
+      },
+    ];
+  }, [state.franchises]);
+
+  const currentTab = tabs.find((tab) => tab.id === selectedTab);
+
+  const displayFranchises = currentTab?.franchises.filter((franchise) =>
+    searchTerm
+      ? franchise.manga.title.toLowerCase().includes(searchTerm.toLowerCase())
+      : true,
+  );
+
   const handleSelectManga = (manga: Manga) => {
-    setState((s) => ({
-      ...s,
+    const franchise = state.franchises.find(
+      (item) => item.manga.id === manga.id,
+    );
+
+    setState((current) => ({
+      ...current,
       currentFranchiseId: manga.id,
     }));
-    setNewManga(manga);
-  };
 
-  const handleBudgetChange = (value: BudgetLevel) => {
-    setState((s) => ({ ...s, budget: value }));
-  };
-
-  const handleEpisodeCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const count = parseInt(e.target.value, 10);
-    if (!isNaN(count) && count > 0) {
-      setEpisodeCount(count);
-    }
+    setEpisodeCount(franchise?.episodeCount ?? initialState.episodeCount);
+    setIsDialogOpen(true);
   };
 
   const handleAdaptManga = () => {
     if (!currentFranchise) return;
-    const updated = state.franchises.map((f) =>
-      f.manga.id === currentFranchise.manga.id
-        ? { ...f, adapted: true, episodeCount, review: generateReview(f.manga, currentFranchise) }
-        : f
-    );
-    setState((s) => ({ ...s, franchises: updated }));
-    toast.success(`Adapted ${currentFranchise.manga.title}`);
-  };
 
-  const generateReview = (manga: Manga, franchise: Franchise) => {
-    const scoreMap: Record<number, string> = {
-      0: "Abysmal",
-      1: "Terrible",
-      2: "Poor",
-      3: "Below Average",
-      4: "Average",
-      5: "Decent",
-      6: "Good",
-      7: "Very Good",
-      8: "Great",
-      9: "Excellent",
-      10: "Masterpiece",
-    };
-    const popularityScore = manga.popularity;
-    const rating = scoreMap[Math.min(10, Math.max(0, Math.round(popularityScore / 10)))];
-    const salesUnits = manga.salesVolumes.toLocaleString();
-    const streamingRevenue = (manga.popularity * 10000).toLocaleString();
-    return [
-      `AI Critic Review: ${rating} (${Math.round(popularityScore)}/10)`,
-      "",
-      `Source Material: ${manga.title} (${manga.status}, ${manga.chapters} chapters, ${manga.tankobonVolumes} tankobon volumes)`,
-      `Popularity: ${manga.popularity}%`,
-      `Approval Rating: ${Math.round(popularityScore / 10)}%`,
-      `Physical Media Sales: ${salesUnits} units`,
-      `Streaming Revenue: $${streamingRevenue}`,
-      `Verdict: ${rating === "Masterpiece" ? "A breakout hit that redefined the franchise." : "A solid adaptation that captured the essence of the source."}`,
-    ].join("\n");
+    const nextEpisodeCount = episodeCount;
+
+    setState((current) => ({
+      ...current,
+      episodeCount: nextEpisodeCount,
+      franchises: current.franchises.map((franchise) =>
+        franchise.manga.id === currentFranchise.manga.id
+          ? {
+              ...franchise,
+              adapted: true,
+              episodeCount: nextEpisodeCount,
+              review: generateReview(franchise.manga, {
+                episodeCount: nextEpisodeCount,
+              }),
+            }
+          : franchise,
+      ),
+    }));
+
+    toast.success(`Adapted ${currentFranchise.manga.title}`);
+    setIsDialogOpen(false);
   };
 
   const handleSaveGame = () => {
-    const saveData = JSON.stringify(state);
-    localStorage.setItem(STORAGE_KEY, saveData);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     toast.success("Game saved!");
   };
 
   const handleLoadGame = () => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setState(parsed);
-      toast.success("Game loaded!");
-    } else {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) {
       toast.error("No saved game found.");
+      return;
     }
+
+    setState(JSON.parse(saved));
+    toast.success("Game loaded!");
   };
 
-  const handleSettingsToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Settings toggle:", e.target.value);
+  const handleSettingsToggle = (checked: boolean) => {
+    console.log("Settings toggle:", checked);
   };
 
   const handleExitToMainMenu = () => {
-    router.push("/");
+    navigate("/");
   };
 
-  const tabs = useMemo(() => {
-    return [
-      { id: "toAdapt", label: "To Adapt", mangas: state.franchises.filter((f) => !f.adapted) },
-      { id: "adapted", label: "Adapted", mangas: state.franchises.filter((f) => f.adapted) },
-      { id: "allAdapted", label: "All Adapted", mangas: state.franchises },
-    ];
-  }, [state.franchises]);
-
-  const currentTab = tabs.find((t) => t.id === selectedTab);
-  const displayMangas = currentTab?.mangas.filter((m) =>
-    searchTerm ? m.title.toLowerCase().includes(searchTerm.toLowerCase()) : true
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header Menu */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-800">Anime Producer Simulator</h1>
-          <div className="flex gap-3">
-            <Button onClick={handleSaveGame} className="px-4">
-              Save            </Button>
-            <Button onClick={handleLoadGame} className="px-4">
+    <div className="min-h-screen bg-slate-50 p-4">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-950">
+              Anime Producer Simulator
+            </h1>
+            <p className="text-sm text-slate-600">
+              Manage your adaptation roster and track critic reviews.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={handleSaveGame}>Save</Button>
+            <Button variant="outline" onClick={handleLoadGame}>
               Load
             </Button>
-            <Button onClick={handleExitToMainMenu} className="px-4 bg-red-50">
+            <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
+              Settings
+            </Button>
+            <Button variant="destructive" onClick={handleExitToMainMenu}>
               Main Menu
             </Button>
           </div>
         </div>
 
-        {/* Settings Popup */}
-        <Button
-          variant="outline"
-          onClick={() => setIsSettingsOpen(true)}
-          className="rounded-full p-2"
-        >
-          <Label className="text-sm text-slate-600">⚙️</Label>
-        </Button>
+        <HomepageTabs tab={selectedTab} setTab={setSelectedTab} />
+
+        <div className="space-y-3">
+          <Input
+            type="text"
+            placeholder="Search manga..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {displayFranchises && displayFranchises.length > 0 ? (
+            displayFranchises.map((franchise) => {
+              const { manga } = franchise;
+              const isAdapted = franchise.adapted;
+
+              return (
+                <Card
+                  key={manga.id}
+                  className={cn(
+                    "cursor-pointer rounded-lg border p-4 shadow-sm transition hover:shadow-md",
+                    isAdapted
+                      ? "border-green-200 bg-green-50"
+                      : "border-slate-200 bg-white",
+                  )}
+                  onClick={() => handleSelectManga(manga)}
+                >
+                  <CardContent className="space-y-2 p-0">
+                    <h3 className="text-lg font-semibold text-slate-950">
+                      {manga.title}
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      Popularity: {manga.popularity}%
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      Chapters: {manga.chapters}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      Status: {isAdapted ? "Adapted" : "To Adapt"}
+                    </p>
+
+                    {franchise.review && (
+                      <p className="rounded bg-white px-2 py-1 text-xs text-green-800">
+                        {franchise.review.split("\n")[0]}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })
+          ) : (
+            <Card className="md:col-span-2">
+              <CardContent className="py-8 text-center text-sm text-slate-600">
+                No manga found for this tab.
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {currentFranchise && isDialogOpen && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{currentFranchise.manga.title}</DialogTitle>
+                <DialogDescription>
+                  Review production details before adapting.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="grid gap-3 md:grid-cols-2 text-sm">
+                  <div>
+                    <span className="font-medium">Budget:</span>{" "}
+                    {state.budget}
+                  </div>
+                  <div>
+                    <span className="font-medium">Rights Purchased:</span>{" "}
+                    {state.rightsPurchased ? "Yes" : "No"}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="episode-count">Episode Count</Label>
+                  <Input
+                    id="episode-count"
+                    type="number"
+                    min={1}
+                    value={episodeCount}
+                    onChange={(event) =>
+                      setEpisodeCount(Number(event.target.value) || 1)
+                    }
+                  />
+                </div>
+
+                {currentFranchise.review ? (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold">AI Critic Review</h3>
+                    <pre className="whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-sm text-slate-800">
+                      {currentFranchise.review}
+                    </pre>
+                  </div>
+                ) : (
+                  <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                    No review yet. Adapt this manga to generate one.
+                  </p>
+                )}
+
+                <Button
+                  className="w-full"
+                  disabled={currentFranchise.adapted}
+                  onClick={handleAdaptManga}
+                >
+                  {currentFranchise.adapted ? "Already Adapted" : "Adapt Now"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-          <DialogHeader>
-            <DialogTitle>Game Settings</DialogHeader>
-          </DialogHeader>
-          <DialogContent className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Label className="flex items-center space-x-2">
-                <Switch checked={false} onCheckedChange={handleSettingsToggle} />
-                <span className="text-sm text-slate-600">Fullscreen</span>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Game Settings</DialogTitle>
+              <DialogDescription>
+                Toggle basic game preferences.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Fullscreen</span>
+                <Switch
+                  checked={false}
+                  onCheckedChange={handleSettingsToggle}
+                />
               </Label>
-              <Label className="flex items-center space-x-2">
-                <Switch checked={false} onCheckedChange={handleSettingsToggle} />
-                <span className="text-sm text-slate-600">Mute Audio</span>
+
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Mute Audio</span>
+                <Switch
+                  checked={false}
+                  onCheckedChange={handleSettingsToggle}
+                />
               </Label>
-              <Label className="flex items-center space-x-2">
-                <Switch checked={false} onCheckedChange={handleSettingsToggle} />
-                <span className="text-sm text-slate-600">Language</span>
+
+              <Label className="flex items-center justify-between gap-4">
+                <span className="text-sm">Language</span>
+                <Switch
+                  checked={false}
+                  onCheckedChange={handleSettingsToggle}
+                />
               </Label>
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Tab Switcher */}
-        <div className="flex justify-center mb-6">
-          <HomepageTabs tab={selectedTab} setTab={setSelectedTab} />
-        </div>
-
-        {/* Manga Display */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {displayMangas.map((manga) => {
-            const franchise = state.franchises.find((f) => f.manga.id === manga.id);
-            const isAdapted = franchise?.adapted ?? false;
-            const bg = isAdapted ? "bg-green-50" : "bg-white";
-            const border = isAdapted ? "border-green-200" : "border-slate-200";
-
-            return (
-              <Card
-                key={manga.id}
-                className={cn(
-                  "rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md",
-                  bg,
-                  border
-                )}
-                onClick={() => handleSelectManga(manga)}
-              >
-                <CardContent className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-800">{manga.title}</h3>
-                  <p className="text-sm text-slate-600">
-                    Popularity: {manga.popularity}%
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Chapters: {manga.chapters}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Status: {franchise?.adapted ? "Adapted" : "To Adapt"}
-                  </p>
-                  {franchise?.review && (
-                    <p className="text-xs text-green-800 bg-green-50 p-2 rounded">
-                      Review: {franchise.review.split("\n")[0]}
-                    </p>
-                  )}
-                  <Input
-                    type="number"
-                    placeholder="Ep #"
-                    className="w-full text-center text-sm"
-                    value={episodeCount}
-                    onChange={handleEpisodeCountChange}
-                  />
-                  {!isAdapted && (
-                    <Button                      onClick={() => handleAdaptManga()}
-                      className="w-full bg-blue-600 text-white"
-                    >
-                      Adapt Now
-                    </Button>
-                  )}
-                  {isAdapted && (
-                    <Button
-                      onClick={() => handleAdaptManga()}
-                      className="w-full bg-gray-300 text-gray-800"
-                      disabled
-                    >
-                      Already Adapted
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Review Modal */}
-        {currentFranchise && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogHeader>
-              <DialogTitle>{currentFranchise.manga.title}</DialogTitle>
-            </DialogHeader>
-            <DialogContent className="space-y-4">
-              <p className="text-sm text-slate-700">
-                <strong>Budget:</strong> {state.budget}
-              </p>
-              <p className="text-sm text-slate-700">
-                <strong>Episode Count:</strong> {episodeCount}
-              </p>
-              <p className="text-sm text-slate-700">
-                <strong>Licensing Rights Purchased:</strong> {state.rightsPurchased ? "Yes" : "No"}
-              </p>
-              <h3 className="font-medium">AI Critic Review</h3>
-              <p className="bg-white p-3 rounded shadow">
-                {generateReview(currentFranchise.manga, currentFranchise)}
-              </p>
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
     </div>
   );

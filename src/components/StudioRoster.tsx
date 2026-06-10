@@ -1,46 +1,4 @@
-"use client" import React...`
-
-The space after `"use client"` might have been preserved but there was no semicolon. The error actually now says:
-`1 | "use client" import React...`
-
-Wait, let me re-read the error:
-`1 | "use client" import React, { useState, useMemo } from "react";`
-
-So there IS a space between `"use client"` and `import`, but no semicolon. The JavaScript parser sees `"use client"` as a string literal (expression statement) and then sees `import` which is invalid in that context.
-
-The fix is simply to change:
-`"use client" import` 
-to:
-`"use client"; import`
-
-Or even better, put them on separate lines:
-```
-"use client";
-
-import React...
-```
-
-I need to make sure I use a newline or semicolon between `"use client"` and `import`.
-
-Similarly, for ShowRoster.tsx the user is complaining about another error. Let me look at ShowRoster again.
-
-Wait, the user only sent one error block for StudioRoster this time. Actually the user says "Fix error" and sent the StudioRoster error. So I just need to fix StudioRoster.tsx again.
-
-I need to make sure I put a newline or semicolon after `"use client"`.
-
-Let me also check ShowRoster.tsx since it was also broken before. But the user's most recent request specifically mentions the StudioRoster error.
-
-I will rewrite StudioRoster.tsx with proper formatting (multiline) to ensure it's syntactically correct.
-
-Ah, I see the pattern. The previous fix for ShowRoster.tsx added a `;` after `"use client"`. But for StudioRoster.tsx I missed it.
-
-Actually looking at my last response for StudioRoster.tsx, I wrote: `"use client" import...` without a semicolon! That is the root cause.
-
-So I need to provide a clean, properly formatted StudioRoster.tsx.</think>I'll fix the syntax error by adding a semicolon and line break after `"use client"` so the imports are parsed correctly.
-
-<dyad-write path="src/components/StudioRoster.tsx" description="Rewriting StudioRoster.tsx with correct syntax and formatting">
-"use client";
-
+"use client"
 import React, { useState, useMemo } from "react";
 import { Studio } from "@/data/studios";
 import { Input } from "@/components/ui/input";

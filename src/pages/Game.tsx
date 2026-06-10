@@ -27,6 +27,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -140,7 +141,7 @@ const Game = () => {
 
   // New settings state
   const [soundVolume, setSoundVolume] = useState(50);
-  const [language, setLanguage] = useState("English");
+  const { language, setLanguage } = useLanguage();
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -256,6 +257,9 @@ const Game = () => {
             <p className="text-sm text-slate-600">
               Manage your adaptation roster and track critic reviews.
             </p>
+            <p className="text-sm text-slate-600">
+              Current language: <span className="font-medium">{language}</span>
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -345,7 +349,8 @@ const Game = () => {
               <div className="space-y-4">
                 <div className="grid gap-3 md:grid-cols-2 text-sm">
                   <div>
-                    <span className="font-medium">Budget:</span> {state.budget}
+                    <span className="font-medium">Budget:</span>{" "}
+                    {state.budget}
                   </div>
                   <div>
                     <span className="font-medium">Rights Purchased:</span>{" "}
@@ -421,7 +426,7 @@ const Game = () => {
             {/* Language dropdown */}
             <div>
               <Label className="block mb-2 text-sm font-medium">Language</Label>
-              <Select value={language} onValueChange={setLanguage}>
+              <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>

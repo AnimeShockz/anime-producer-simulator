@@ -20,14 +20,15 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Home = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const navigate = useNavigate();
 
-  // New settings state
+  // Settings state
   const [soundVolume, setSoundVolume] = useState(50);
-  const [language, setLanguage] = useState("English");
+  const { language, setLanguage } = useLanguage();
 
   const handleCreateNewGame = () => {
     navigate("/game");
@@ -41,7 +42,7 @@ const Home = () => {
     alert("Exit to Windows clicked.");
   };
 
-  const handleSettingsChange = (checked: boolean) => {
+  const handleSettingsToggle = (checked: boolean) => {
     console.log("Fullscreen toggle:", checked);
   };
 
@@ -54,6 +55,9 @@ const Home = () => {
           </h1>
           <p className="text-sm text-slate-600">
             Build your anime season, choose studios, and review the results.
+          </p>
+          <p className="text-sm text-slate-600">
+            Current language: <span className="font-medium">{language}</span>
           </p>
         </div>
 
@@ -101,7 +105,7 @@ const Home = () => {
               {/* Fullscreen toggle */}
               <Label className="flex items-center justify-between gap-4">
                 <span className="text-sm">Fullscreen</span>
-                <Switch checked={false} onCheckedChange={handleSettingsChange} />
+                <Switch checked={false} onCheckedChange={handleSettingsToggle} />
               </Label>
 
               {/* Sound volume slider */}
@@ -120,7 +124,7 @@ const Home = () => {
               {/* Language dropdown */}
               <div>
                 <Label className="block mb-2 text-sm font-medium">Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>

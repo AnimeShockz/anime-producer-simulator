@@ -35,6 +35,8 @@ import { showSuccess } from "@/utils/toast";
 
 const STORAGE_KEY = "anime-producer-save";
 
+type TabOption = "toAdapt" | "adapted" | "allAdapted";
+
 type Franchise = {
   manga: Manga;
   adapted: boolean;
@@ -50,9 +52,25 @@ type GameState = {
   rightsPurchased: boolean;
 };
 
-/* ... unchanged helper functions ... */
+const initialState: GameState = {
+  franchises: mangaList.map((m) => ({
+    manga: m,
+    adapted: false,
+    review: null,
+    episodeCount: 0,
+  })),
+  currentFranchiseId: null,
+  budget: "average",
+  episodeCount: 12,
+  rightsPurchased: false,
+};
 
-const Game = () => {
+/* placeholder review generator */
+function generateReview(_manga: Manga, _opts: { episodeCount: number }) {
+  return "AI Critic Review: (placeholder)";
+}
+
+export const Game = () => {
   const [state, setState] = useLocalStorage<GameState>(STORAGE_KEY, initialState);
   const [selectedTab, setSelectedTab] = useState<TabOption>("toAdapt");
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,7 +85,10 @@ const Game = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  /* ... unchanged logic ... */
+  const currentFranchise = useMemo(
+    () => state.franchises.find((f) => f.manga.id === state.currentFranchiseId) ?? null,
+    [state],
+  );
 
   const handleAdaptManga = () => {
     if (!currentFranchise) return;
@@ -107,7 +128,7 @@ const Game = () => {
     showSuccess(t("load"));
   };
 
-  /* ... unchanged render ... */
+  /* ... rest of component unchanged ... */
 };
 
 export default Game;

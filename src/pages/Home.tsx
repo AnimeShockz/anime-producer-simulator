@@ -21,6 +21,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useT } from "@/lib/i18n";
 
 const Home = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -29,6 +30,7 @@ const Home = () => {
   // Settings state
   const [soundVolume, setSoundVolume] = useState(50);
   const { language, setLanguage } = useLanguage();
+  const { t } = useT();
 
   const handleCreateNewGame = () => {
     navigate("/game");
@@ -50,23 +52,16 @@ const Home = () => {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="rounded-2xl bg-white p-8 shadow-lg w-full max-w-2xl space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-slate-950">
-            Anime Producer Simulator
-          </h1>
+          <h1 className="text-4xl font-bold text-slate-950">{t("title")}</h1>
+          <p className="text-sm text-slate-600">{t("tagline")}</p>
           <p className="text-sm text-slate-600">
-            Build your anime season, choose studios, and review the results.
-          </p>
-          <p className="text-sm text-slate-600">
-            Current language: <span className="font-medium">{language}</span>
+            {t("currentLanguage")} <span className="font-medium">{language}</span>
           </p>
         </div>
 
         <div className="flex flex-col space-y-3">
-          <Button
-            onClick={handleCreateNewGame}
-            className="w-full justify-center"
-          >
-            Create New Game
+          <Button onClick={handleCreateNewGame} className="w-full justify-center">
+            {t("createNewGame")}
           </Button>
 
           <Button
@@ -74,7 +69,7 @@ const Home = () => {
             className="w-full justify-center"
             variant="secondary"
           >
-            Load Save
+            {t("loadSave")}
           </Button>
 
           <Button
@@ -82,7 +77,7 @@ const Home = () => {
             className="w-full justify-center"
             variant="outline"
           >
-            Settings
+            {t("settings")}
           </Button>
 
           <Button
@@ -90,27 +85,27 @@ const Home = () => {
             className="w-full justify-center"
             variant="destructive"
           >
-            Exit to Windows
+            {t("exitToWindows")}
           </Button>
         </div>
 
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
           <DialogContent className="space-y-4">
             <DialogHeader>
-              <DialogTitle>Game Settings</DialogTitle>
-              <DialogDescription>Toggle basic game preferences.</DialogDescription>
+              <DialogTitle>{t("settings")}</DialogTitle>
+              <DialogDescription>{t("settings")}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
               {/* Fullscreen toggle */}
               <Label className="flex items-center justify-between gap-4">
-                <span className="text-sm">Fullscreen</span>
+                <span className="text-sm">{t("fullscreen")}</span>
                 <Switch checked={false} onCheckedChange={handleSettingsToggle} />
               </Label>
 
               {/* Sound volume slider */}
               <div>
-                <Label className="block mb-2 text-sm font-medium">Sound Volume</Label>
+                <Label className="block mb-2 text-sm font-medium">{t("soundVolume")}</Label>
                 <Slider
                   min={0}
                   max={100}
@@ -123,10 +118,10 @@ const Home = () => {
 
               {/* Language dropdown */}
               <div>
-                <Label className="block mb-2 text-sm font-medium">Language</Label>
+                <Label className="block mb-2 text-sm font-medium">{t("language")}</Label>
                 <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select language" />
+                    <SelectValue placeholder={t("language")} />
                   </SelectTrigger>
                   <SelectContent>
                     {[

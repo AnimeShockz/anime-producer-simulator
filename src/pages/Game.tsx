@@ -28,6 +28,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useT } from "@/lib/i18n";
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -58,9 +59,9 @@ const tabOptions = ["toAdapt", "adapted", "allAdapted"] as const;
 type TabOption = (typeof tabOptions)[number];
 
 const tabLabels: Record<TabOption, string> = {
-  toAdapt: "To Adapt",
-  adapted: "Adapted",
-  allAdapted: "All Adapted",
+  toAdapt: "toAdapt",
+  adapted: "adapted",
+  allAdapted: "allAdapted",
 };
 
 const HomepageTabs = ({
@@ -77,7 +78,7 @@ const HomepageTabs = ({
         variant={tabId === tab ? "default" : "outline"}
         onClick={() => setTab(tabId)}
       >
-        {tabLabels[tabId]}
+        {tabId}
       </Button>
     ))}
   </div>
@@ -129,19 +130,17 @@ const generateReview = (
 };
 
 const Game = () => {
-  const [state, setState] = useLocalStorage<GameState>(
-    STORAGE_KEY,
-    initialState,
-  );
+  const [state, setState] = useLocalStorage<GameState>(STORAGE_KEY, initialState);
   const [selectedTab, setSelectedTab] = useState<TabOption>("toAdapt");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [episodeCount, setEpisodeCount] = useState(initialState.episodeCount);
 
-  // New settings state
+  // Settings state
   const [soundVolume, setSoundVolume] = useState(50);
   const { language, setLanguage } = useLanguage();
+  const { t } = useT();
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -157,21 +156,21 @@ const Game = () => {
     return [
       {
         id: "toAdapt",
-        label: "To Adapt",
+        label: t("toAdapt"),
         franchises: state.franchises.filter((franchise) => !franchise.adapted),
       },
       {
         id: "adapted",
-        label: "Adapted",
+        label: t("adapted"),
         franchises: state.franchises.filter((franchise) => franchise.adapted),
       },
       {
         id: "allAdapted",
-        label: "All Adapted",
+        label: t("allAdapted"),
         franchises: state.franchises,
       },
     ];
-  }, [state.franchises]);
+  }, [state.franchises, t]);
 
   const currentTab = tabs.find((tab) => tab.id === selectedTab);
 
@@ -182,24 +181,18 @@ const Game = () => {
   );
 
   const handleSelectManga = (manga: Manga) => {
-    const franchise = state.franchises.find(
-      (item) => item.manga.id === manga.id,
-    );
-
+    const franchise = state.franchises.find((item) => item.manga.id === manga.id);
     setState((current) => ({
       ...current,
       currentFranchiseId: manga.id,
     }));
-
     setEpisodeCount(franchise?.episodeCount ?? initialState.episodeCount);
     setIsDialogOpen(true);
   };
 
   const handleAdaptManga = () => {
     if (!currentFranchise) return;
-
     const nextEpisodeCount = episodeCount;
-
     setState((current) => ({
       ...current,
       episodeCount: nextEpisodeCount,
@@ -216,26 +209,23 @@ const Game = () => {
           : franchise,
       ),
     }));
-
     toast.success(`Adapted ${currentFranchise.manga.title}`);
     setIsDialogOpen(false);
   };
 
   const handleSaveGame = () => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    toast.success("Game saved!");
+    toast.success(t("save"));
   };
 
   const handleLoadGame = () => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
-
     if (!saved) {
       toast.error("No saved game found.");
       return;
     }
-
     setState(JSON.parse(saved));
-    toast.success("Game loaded!");
+    toast.success(t("load"));
   };
 
   const handleSettingsToggle = (checked: boolean) => {
@@ -251,73 +241,62 @@ const Game = () => {
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-950">
-              Anime Producer Simulator
-            </h1>
+            <h1 className="text-3xl font-bold text-slate-950">{t("title")}</h1>
+            <p className="text-sm text-slate-600">{t("manageRoster")}</p>
             <p className="text-sm text-slate-600">
-              Manage your adaptation roster and track critic reviews.
-            </p>
-            <p className="text-sm text-slate-600">
-              Current language: <span className="font-medium">{language}</span>
+              {t("currentLanguage")} <span className="font-medium">{language}</span>
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={handleSaveGame}>Save</Button>
+            <Button onClick={handleSaveGame}>{t("save")}</Button>
             <Button variant="outline" onClick={handleLoadGame}>
-              Load
+              {t("load")}
             </Button>
             <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
-              Settings
+              {t("settings")}
             </Button>
             <Button variant="destructive" onClick={handleExitToMainMenu}>
-              Main Menu
+              {t("mainMenu")}
             </Button>
           </div>
         </div>
 
+        {/* Tabs */}
         <HomepageTabs tab={selectedTab} setTab={setSelectedTab} />
 
+        {/* Search */}
         <div className="space-y-3">
           <Input
             type="text"
-            placeholder="Search manga..."
+            placeholder={t("searchPlaceholder")}
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
+        {/* Franchise list */}
         <div className="grid gap-4 md:grid-cols-2">
           {displayFranchises && displayFranchises.length > 0 ? (
             displayFranchises.map((franchise) => {
               const { manga } = franchise;
               const isAdapted = franchise.adapted;
-
               return (
                 <Card
                   key={manga.id}
                   className={cn(
                     "cursor-pointer rounded-lg border p-4 shadow-sm transition hover:shadow-md",
-                    isAdapted
-                      ? "border-green-200 bg-green-50"
-                      : "border-slate-200 bg-white",
+                    isAdapted ? "border-green-200 bg-green-50" : "border-slate-200 bg-white",
                   )}
                   onClick={() => handleSelectManga(manga)}
                 >
                   <CardContent className="space-y-2 p-0">
-                    <h3 className="text-lg font-semibold text-slate-950">
-                      {manga.title}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-slate-950">{manga.title}</h3>
+                    <p className="text-sm text-slate-600">Popularity: {manga.popularity}%</p>
+                    <p className="text-sm text-slate-600">Chapters: {manga.chapters}</p>
                     <p className="text-sm text-slate-600">
-                      Popularity: {manga.popularity}%
+                      Status: {isAdapted ? t("adapted") : t("toAdapt")}
                     </p>
-                    <p className="text-sm text-slate-600">
-                      Chapters: {manga.chapters}
-                    </p>
-                    <p className="text-sm text-slate-600">
-                      Status: {isAdapted ? "Adapted" : "To Adapt"}
-                    </p>
-
                     {franchise.review && (
                       <p className="rounded bg-white px-2 py-1 text-xs text-green-800">
                         {franchise.review.split("\n")[0]}
@@ -336,6 +315,7 @@ const Game = () => {
           )}
         </div>
 
+        {/* Adapt dialog */}
         {currentFranchise && isDialogOpen && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="max-w-lg">
@@ -349,39 +329,34 @@ const Game = () => {
               <div className="space-y-4">
                 <div className="grid gap-3 md:grid-cols-2 text-sm">
                   <div>
-                    <span className="font-medium">Budget:</span>{" "}
-                    {state.budget}
+                    <span className="font-medium">{t("budget")}:</span> {state.budget}
                   </div>
                   <div>
-                    <span className="font-medium">Rights Purchased:</span>{" "}
+                    <span className="font-medium">{t("rightsPurchased")}:</span>{" "}
                     {state.rightsPurchased ? "Yes" : "No"}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="episode-count">Episode Count</Label>
+                  <Label htmlFor="episode-count">{t("episodeCount")}</Label>
                   <Input
                     id="episode-count"
                     type="number"
                     min={1}
                     value={episodeCount}
-                    onChange={(event) =>
-                      setEpisodeCount(Number(event.target.value) || 1)
-                    }
+                    onChange={(e) => setEpisodeCount(Number(e.target.value) || 1)}
                   />
                 </div>
 
                 {currentFranchise.review ? (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold">AI Critic Review</h3>
+                    <h3 className="text-sm font-semibold">{t("gameSettings")}</h3>
                     <pre className="whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-sm text-slate-800">
                       {currentFranchise.review}
                     </pre>
                   </div>
                 ) : (
-                  <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-                    No review yet. Adapt this manga to generate one.
-                  </p>
+                  <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{t("noReview")}</p>
                 )}
 
                 <Button
@@ -389,30 +364,30 @@ const Game = () => {
                   disabled={currentFranchise.adapted}
                   onClick={handleAdaptManga}
                 >
-                  {currentFranchise.adapted ? "Already Adapted" : "Adapt Now"}
+                  {currentFranchise.adapted ? t("alreadyAdapted") : t("adaptNow")}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
         )}
 
-        {/* Settings dialog with sound slider and language dropdown */}
+        {/* Settings dialog */}
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
           <DialogContent className="max-w-md space-y-4">
             <DialogHeader>
-              <DialogTitle>Game Settings</DialogTitle>
-              <DialogDescription>Toggle basic game preferences.</DialogDescription>
+              <DialogTitle>{t("gameSettings")}</DialogTitle>
+              <DialogDescription>{t("settings")}</DialogDescription>
             </DialogHeader>
 
             {/* Fullscreen toggle */}
             <Label className="flex items-center justify-between gap-4">
-              <span className="text-sm">Fullscreen</span>
+              <span className="text-sm">{t("toggleFullscreen")}</span>
               <Switch checked={false} onCheckedChange={handleSettingsToggle} />
             </Label>
 
             {/* Sound volume slider */}
             <div>
-              <Label className="block mb-2 text-sm font-medium">Sound Volume</Label>
+              <Label className="block mb-2 text-sm font-medium">{t("soundVolume")}</Label>
               <Slider
                 min={0}
                 max={100}
@@ -425,10 +400,10 @@ const Game = () => {
 
             {/* Language dropdown */}
             <div>
-              <Label className="block mb-2 text-sm font-medium">Language</Label>
+              <Label className="block mb-2 text-sm font-medium">{t("language")}</Label>
               <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select language" />
+                  <SelectValue placeholder={t("language")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[

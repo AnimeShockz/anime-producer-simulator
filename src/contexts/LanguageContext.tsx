@@ -24,7 +24,7 @@ const LanguageContext = createContext<LanguageContextProps | undefined>(undefine
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState<Language>("English");
+  const [language, setLanguage] = useState<Language>("English"); // default
 
   // Load from localStorage on mount
   useEffect(() => {

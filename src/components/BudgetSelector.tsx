@@ -1,23 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast"; // Correct import path
+import React from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
-const BudgetSelector = () => {
-  const [selectedBudget, setSelectedBudget] = useState("average");
-  const { toast } = useToast(); // Now correctly imported
+interface Props {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-  const handleBudgetChange = (event) => {
-    setSelectedBudget(event.target.value);
-    toast.success(`Budget selected: ${event.target.value}`);
+const BudgetSelector: React.FC<Props> = ({ value, onChange }) => {
+  const { toast } = useToast();
+
+  const handleBudgetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = event.target.value;
+    onChange(newVal);
+    toast.success(`Budget selected: ${newVal}`);
   };
 
   return (
     <div className="flex flex-col space-y-2">
       <label className="text-sm font-medium">Select Budget</label>
       <select
-        value={selectedBudget}
+        value={value}
         onChange={handleBudgetChange}
         className="w-full p-2 border border-gray-300 rounded-md"
       >

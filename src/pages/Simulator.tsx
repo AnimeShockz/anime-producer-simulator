@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom"; // ← use React Router instead of next/navigation
+import { useNavigate } from "react-router-dom";
 import MangaCard from "@/components/MangaCard";
 import StudioCard from "@/components/StudioCard";
 import BudgetSelector from "@/components/BudgetSelector";
@@ -19,6 +19,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { budgetValue } from "@/data/studios"; // numeric budget map
 
 const MANGA_LIST: Manga[] = [
   {
@@ -148,20 +149,24 @@ export default function Simulator() {
   const [language, setLanguage] = useState<string>("English");
   const [volume, setVolume] = useState<number>(50);
   const { toast } = useToast();
-  const navigate = useNavigate(); // ← React Router navigation
+  const navigate = useNavigate();
 
+  // Convert budget strings to numeric values for a proper comparison
   const isEligible =
     selectedStudio &&
     selectedBudget &&
     selectedManga &&
-    selectedBudget >=
-      (STUDIOS.find((s) => s.id === selectedStudio)?.minBudget as string);
+    budgetValue[selectedBudget as keyof typeof budgetValue] >=
+      budgetValue[
+        (STUDIOS.find((s) => s.id === selectedStudio)?.minBudget ??
+          "low") as keyof typeof budgetValue
+      ];
 
   const handleProduce = () => {
     toast.success(
       `Produced ${selectedManga?.title} with ${selectedStudio} on ${selectedBudget} budget (Lang: ${language}, Vol: ${volume}%)`,
     );
-    navigate("/simulator/result"); // ← navigate to result page
+    navigate("/simulator/result");
   };
 
   if (!selectedManga || !selectedStudio || !selectedBudget) {
@@ -256,7 +261,7 @@ export default function Simulator() {
           </div>
         </div>
 
-        <ProduceButton isEligible={isEligible} onProduce={handleProduce} />
+        <ProduceButton isEligible={!!isEligible} onProduce={handleProduce} />
 
         {isEligible === false && (
           <p className="text-red-600 text-sm mt-2">
@@ -315,7 +320,7 @@ export default function Simulator() {
             </div>
           </div>
 
-          <ProduceButton isEligible={isEligible} onProduce={handleProduce} />
+          <ProduceButton isEligible={!!isEligible} onProduce={handleProduce} />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast"; // Fixed import path
+import { useToast } from "@/hooks/use-toast"; // Correct import path
 import { Button } from "@/components/ui/button";
 
 const BudgetSelector = () => {

@@ -47,7 +47,7 @@ export const budgetValue: Record<BudgetLevel, number> = {
 };
 
 export const studios: Studio[] = [
-  // 1️⃣ Large, globally recognised studios
+  // Large, globally recognised studios
   {
     id: "ufotable",
     name: "Ufotable",
@@ -154,7 +154,7 @@ export const studios: Studio[] = [
     popularity: 88,
   },
 
-  // 2️⃣ Mid‑size studios with strong reputations
+  // Mid‑size studios with strong reputations
   {
     id: "studio-trigger",
     name: "Studio Trigger",
@@ -246,7 +246,7 @@ export const studios: Studio[] = [
     popularity: 68,
   },
 
-  // 3️⃣ Boutique and specialty studios (all real)
+  // Boutique / specialty studios (all real)
   {
     id: "graphin",
     name: "Graphin",
@@ -308,7 +308,7 @@ export const studios: Studio[] = [
     popularity: 55,
   },
 
-  // 4️⃣ Additional well‑known studios (real)
+  // Additional well‑known studios
   {
     id: "j.c.staff",
     name: "J.C. Staff",
@@ -370,7 +370,7 @@ export const studios: Studio[] = [
     popularity: 57,
   },
   {
-    id: "gallop",
+    id: "studio-gallop",
     name: "Studio Gallop",
     minBudget: "average",
     size: "large",
@@ -444,8 +444,6 @@ export const studios: Studio[] = [
       "Specialises in short, feel‑good series.",
     popularity: 45,
   },
-
-  // 5️⃣ Additional notable studios (real)
   {
     id: "brainbox",
     name: "Brain’s Base",
@@ -462,21 +460,6 @@ export const studios: Studio[] = [
     popularity: 70,
   },
   {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-  {
     id: "shirogumi",
     name: "Shirogumi",
     minBudget: "low",
@@ -489,21 +472,6 @@ export const studios: Studio[] = [
     pacing: "fast",
     styleDescription:
       "3‑D and 2‑D hybrid works, often with vibrant color palettes.",
-    popularity: 55,
-  },
-  {
-    id: "satelight",
-    name: "Satelight",
-    minBudget: "low",
-    size: "large",
-    genres: ["mecha", "action", "sports"],
-    themes: ["robotics", "competition", "friendship"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Veteran studio with decades of experience in action and mecha anime.",
     popularity: 55,
   },
   {
@@ -550,475 +518,5 @@ export const studios: Studio[] = [
     styleDescription:
       "Bright, colorful animation with a focus on character interactions.",
     popularity: 45,
-  },
-  {
-    id: "satelight",
-    name: "Satelight",
-    minBudget: "low",
-    size: "large",
-    genres: ["mecha", "action", "sports"],
-    themes: ["robotics", "competition", "friendship"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Veteran studio with decades of experience in action and mecha anime.",
-    popularity: 55,
-  },
-
-  // 6️⃣ Additional niche but real studios
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 7️⃣ Additional well‑known studios (real)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 8️⃣ Additional real studios (ensuring >30 total)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 9️⃣ Additional real studios (ensuring variety)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 10️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 11️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 12️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 13️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 14️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 15️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 16️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 17️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 18️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 19️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 20️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 21️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 22️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 23️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 24️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 25️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 26️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 27️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 28️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 29️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
-  },
-
-  // 30️⃣ Additional real studios (ensuring >30)
-  {
-    id: "gallop",
-    name: "Studio Gallop",
-    minBudget: "average",
-    size: "large",
-    genres: ["sports", "action", "comedy"],
-    themes: ["competition", "teamwork", "growth"],
-    ageGroups: ["shonen"],
-    lengthPreference: "long",
-    complexity: "medium",
-    pacing: "medium",
-    styleDescription:
-      "Long‑standing studio famous for sports and shonen titles.",
-    popularity: 68,
   },
 ];

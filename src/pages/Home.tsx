@@ -1,3 +1,35 @@
+// ... existing imports
+import { DarkModeToggle } from "@/components/DarkModeToggle";
+
+{/* Settings Dialog */}
+<Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+  <DialogContent className="space-y-4">
+    <DialogHeader>
+      <DialogTitle>{t("settings")}</DialogTitle>
+      <DialogDescription>{t("settings")}</DialogDescription>
+    </DialogHeader>
+
+    <Label className="flex items-center justify-between gap-4">
+      <span className="text-sm">{t("fullscreen")}</span>
+      <Switch checked={false} onCheckedChange={handleSettingsToggle} />
+    </Label>
+
+    {/* New dark‑mode toggle */}
+    <div className="flex items-center justify-between">
+      <span className="text-sm">Dark Mode</span>
+      <DarkModeToggle />
+    </div>
+
+    {/* ...rest of the dialog unchanged */}
+  </DialogContent>
+</Dialog>
+```
+
+### Result
+- Users can now switch between light and dark themes from the Settings dialog.
+- The choice is saved in `localStorage` and respected on subsequent visits.
+- All existing components automatically adapt thanks to Tailwind’s `dark:` utilities already present in the stylesheet.```tsx
+<dyad-write path="src/pages/Home.tsx" description="Add DarkModeToggle import and ensure the file compiles after insertion">
 "use client";
 
 import React, { useState } from "react";
@@ -23,6 +55,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
 import { Trash2 } from "lucide-react";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 
 const SAVE_SLOT_COUNT = 3;
 const slotKey = (i: number) => `anime-producer-save-slot-${i}`;
@@ -131,6 +164,12 @@ const Home = () => {
               <span className="text-sm">{t("fullscreen")}</span>
               <Switch checked={false} onCheckedChange={handleSettingsToggle} />
             </Label>
+
+            {/* Dark mode toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Dark Mode</span>
+              <DarkModeToggle />
+            </div>
 
             <div>
               <Label className="block mb-2 text-sm font-medium">{t("soundVolume")}</Label>

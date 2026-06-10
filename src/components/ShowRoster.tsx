@@ -3,38 +3,47 @@
 import React, { useState } from "react";
 import { Manga } from "@/data/manga";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ShowRosterProps {
   mangaList: Manga[];
   selectedManga: Manga | null;
+  season: number;
   onSelectManga: (manga: Manga) => void;
 }
 
-const getSynopsis = (manga: Manga) => {
-  const title = manga.title.toLowerCase();
-  if (title.includes("starlight") || title.includes("chronicles"))
-    return "An epic saga of heroes battling fate across celestial realms, featuring stunning animation and a haunting orchestral score that defines a new era of storytelling.";
-  if (title.includes("neon") || title.includes("samurai"))
-    return "Cybernetic warriors clash in a neon-lit future metropolis where tradition meets technology. A tale of honor, identity, and the price of progress in a world transformed by artificial intelligence.";
-  if (title.includes("eclipse") || title.includes("café"))
-    return "A cozy tale of love and mystery set in a charming café where each cup of coffee reveals a piece of the puzzle. Serendipitous encounters lead to life-changing discoveries.";
-  if (title.includes("mecha") || title.includes("princess"))
-    return "A high-tech princess pilots a giant mecha to protect her kingdom in a world where machines and magic coexist. An unlikely hero rises to defend what matters most.";
-  if (title.includes("whispering") || title.includes("winds"))
-    return "Gentle spirits guide a wandering traveler through serene landscapes. A meditative journey about finding peace in a chaotic world and the bonds that connect us to nature.";
-  if (title.includes("cyber") || title.includes("ninja"))
-    return "Stealthy ninjas navigate a cyber-punk world of intrigue. Ancient traditions clash with futuristic technology as a lone warrior seeks justice in the digital shadows.";
-  if (title.includes("gourmet") || title.includes("detective"))
-    return "A culinary detective solves mysteries through exquisite cuisine. Each case reveals not just the truth, but the human stories behind the food we love and the meals that define us.";
-  if (title.includes("dragon") || title.includes("kingdom"))
-    return "A legendary dragon rises to reclaim its ancient kingdom. An epic tale of power, legacy, and the eternal struggle between tradition and change in a world ruled by those who command fire.";
-  return "An exciting adventure awaits in this thrilling manga featuring compelling characters and breathtaking action sequences that will keep you engaged from start to finish.";
+const conceptLabel: Record<Manga["conceptType"], string> = {
+  generic: "Straightforward",
+  familiar: "Familiar with a twist",
+  distinctive: "Distinctive"
 };
 
-export default function ShowRoster({ mangaList, selectedManga, onSelectManga }: ShowRosterProps) {
+const formatStatus = (manga: Manga) => {
+  if (manga.status === "finished") return "Finished";
+  return `Running (${manga.releaseFrequency ?? "ongoing"})`;
+};
+
+const formatNumber = (value: number) => value.toLocaleString();
+
+export default function ShowRoster({
+  mangaList,
+  selectedManga,
+  season,
+  onSelectManga
+}: ShowRosterProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailManga, setDetailManga] = useState<Manga | null>(null);
 
@@ -49,22 +58,28 @@ export default function ShowRoster({ mangaList, selectedManga, onSelectManga }: 
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <h2 className="text-lg font-semibold mb-4">Select Manga</h2>
-      <ScrollArea className="flex-1">
-        <div className="space-y-3 pr-4">
+    <div className="flex h-full flex-col">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">Select Manga</h2>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+          Season {season}
+        </span>
+      </div>
+
+      <ScrollArea className="max-h-[430px] pr-4">
+        <div className="space-y-3">
           {mangaList.map((manga) => (
             <Card
               key={manga.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
+              className={`cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${
                 selectedManga?.id === manga.id ? "ring-2 ring-primary" : ""
               }`}
               onClick={() => openDetailDialog(manga)}
             >
-              <CardContent className="pt-4">
-                <h3 className="font-medium text-base">{manga.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Popularity: <span className="font-semibold">{manga.popularity}%</span>
+              <CardContent className="py-4">
+                <h3 className="font-semibold text-base leading-tight">{manga.title}</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  Popularity: <span className="font-semibold text-slate-900">{manga.popularity}%</span>
                 </p>
               </CardContent>
             </Card>
@@ -73,41 +88,67 @@ export default function ShowRoster({ mangaList, selectedManga, onSelectManga }: 
       </ScrollArea>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{detailManga?.title}</DialogTitle>
-            <DialogDescription>
-              {detailManga && `Popularity: ${detailManga.popularity}% • ${detailManga.status === "finished" ? "Finished" : "Ongoing"}`}
+            <DialogDescription className="space-y-1">
+              <p>
+                Popularity:{" "}
+                <span className="font-medium text-slate-950">
+                  {detailManga?.popularity}%
+                </span>
+              </p>
+              <p>
+                Concept:{" "}
+                <span className="font-medium text-slate-950">
+                  {detailManga ? conceptLabel[detailManga.conceptType] : ""}
+                </span>
+              </p>
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+
+          <div className="space-y-5">
             <div>
-              <h4 className="font-medium text-sm mb-1">Synopsis</h4>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {detailManga && getSynopsis(detailManga)}
-              </p>
+              <h4 className="mb-2 text-sm font-semibold">Synopsis</h4>
+              <div className="space-y-1">
+                {detailManga?.synopsis.map((line, index) => (
+                  <p key={`${detailManga.id}-synopsis-${index}`} className="text-sm leading-6 text-slate-700">
+                    {line}
+                  </p>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+
+            <div className="grid grid-cols-2 gap-3 text-sm text-slate-700">
               <div>
-                <span className="font-medium text-gray-600">Chapters:</span>{" "}
+                <span className="font-medium text-slate-950">Status:</span>{" "}
+                {detailManga && formatStatus(detailManga)}
+              </div>
+              <div>
+                <span className="font-medium text-slate-950">Chapters:</span>{" "}
                 {detailManga?.chapters}
               </div>
               <div>
-                <span className="font-medium text-gray-600">Volumes:</span>{" "}
+                <span className="font-medium text-slate-950">Volumes:</span>{" "}
                 {detailManga?.tankobonVolumes}
               </div>
               <div>
-                <span className="font-medium text-gray-600">Sales:</span>{" "}
-                {detailManga && (detailManga.salesVolumes / 1_000_000).toFixed(1)}M
+                <span className="font-medium text-slate-950">Sales:</span>{" "}
+                {detailManga && formatNumber(detailManga.salesVolumes)}
               </div>
-              <div>
-                <span className="font-medium text-gray-600">Magazine:</span>{" "}
+              <div className="col-span-2">
+                <span className="font-medium text-slate-950">Magazine:</span>{" "}
                 {detailManga?.magazine}
               </div>
             </div>
-            {detailManga && selectedManga?.id !== detailManga.id && (
+
+            {detailManga && selectedManga?.id !== detailManga.id ? (
               <Button className="w-full" onClick={() => handleSelect(detailManga)}>
                 Select This Manga
+              </Button>
+            ) : (
+              <Button className="w-full" disabled>
+                Selected Manga
               </Button>
             )}
           </div>

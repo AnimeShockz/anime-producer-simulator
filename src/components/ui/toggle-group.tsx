@@ -42,6 +42,4 @@ export const ToggleGroupItem = ({
 }: {
   value: string;
   children: React.ReactNode;
-}) => (
-  <button className="px-3 py-1 border rounded">{children}</button>
-);
+}) => <button className="px-3 py-1 border rounded">{children}</button>;

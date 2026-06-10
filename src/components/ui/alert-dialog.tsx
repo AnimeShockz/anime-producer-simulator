@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export const AlertDialog = ({ children }: { children: React.ReactNode }) => (
-  <div className={cn("rounded-md border bg-background p-4", "shadow")}>{children}</div>
+  <div className={cn("rounded-md border bg-background p-4 shadow")}>{children}</div>
 );
 export const AlertDialogTrigger = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 export const AlertDialogContent = ({ children }: { children: React.ReactNode }) => (

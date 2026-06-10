@@ -10,4 +10,6 @@ export const ResizablePanel = ({
   defaultSize?: number;
 }) => <div style={{ flex: `0 0 ${defaultSize}px` }}>{children}</div>;
 
-export const ResizableHandle = () => <div style={{ width: "4px", cursor: "col-resize", background: "#ccc" }} />;
+export const ResizableHandle = () => (
+  <div style={{ width: "4px", cursor: "col-resize", background: "#ccc" }} />
+);

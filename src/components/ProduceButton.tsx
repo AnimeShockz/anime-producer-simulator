@@ -2,25 +2,27 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast"; // Correct import path
-import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom"; // ← React Router navigation
 
 interface Props {
   isEligible: boolean;
   onProduce: () => void;
 }
 
-const ProduceButton = ({ isEligible, onProduce }: Props) => {
-  const { toast } = useToast(); // Now correctly imported
-  const router = useRouter();
+const ProduceButton: React.FC<Props> = ({ isEligible, onProduce }) => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleProduce = () => {
+  const handleClick = () => {
     onProduce();
+    // The Simulator page already handles navigation after production,
+    // but we keep this hook in case other pages need it.
   };
 
   return (
     <Button
-      onClick={handleProduce}
+      onClick={handleClick}
       disabled={!isEligible}
       className="w-full justify-between"
       variant={isEligible ? "default" : "secondary"}

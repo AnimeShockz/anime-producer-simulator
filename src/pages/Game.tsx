@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
+import { toast as sonnerToast } from "sonner"; // <-- added import
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -221,7 +222,8 @@ const Game = () => {
   const handleLoadGame = () => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (!saved) {
-      toast.error("No saved game found.");
+      // Use Sonner's error toast (fixed)
+      sonnerToast.error("No saved game found.");
       return;
     }
     setState(JSON.parse(saved));

@@ -1,9 +1,7 @@
-// ... existing imports and types remain unchanged ...
-
 export const studios: Studio[] = [
-  // ... all previous studio entries ...
+  // … all previous studios …
 
-  // Defunct studio – Easter egg
+  // Defunct studio – Easter egg (now high popularity)
   {
     id: "triangle-staff",
     name: "Triangle Staff (defunct)",
@@ -17,6 +15,6 @@ export const studios: Studio[] = [
     pacing: "fast",
     styleDescription:
       "A short‑lived studio known for classic 90s action‑adventure titles. No longer active, but appears as a nostalgic easter‑egg.",
-    popularity: 5, // very low to keep it hidden unless specifically searched
+    popularity: 120, // high so it shows up in searches/sorts
   },
 ];

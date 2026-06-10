@@ -1,7 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";   // <-- changed import
 import Home from "./pages/Home";
 import Game from "./pages/Game";
 import NotFound from "./pages/NotFound";
@@ -13,14 +13,14 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <BrowserRouter>
+      <HashRouter>                     {/* <-- use HashRouter */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/game" element={<Game />} />
           <Route path="/simulator" element={<Simulator />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </LanguageProvider>
   </QueryClientProvider>
 );

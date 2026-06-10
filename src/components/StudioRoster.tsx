@@ -112,7 +112,7 @@ export default function StudioRoster({
                 <CardContent className="pt-4">
                   <h3 className="font-medium text-base">{studio.name}</h3>
                   <p className="text-sm text-slate-600 mt-1">
-                    Min Budget: {" "}
+                    Min Budget:{" "}
                     <span className="font-semibold">{studio.minBudget}</span>
                   </p>
                 </CardContent>
@@ -122,8 +122,9 @@ export default function StudioRoster({
         </div>
       </ScrollArea>
 
+      {/* Dialog with high z-index */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md z-50">
           <DialogHeader>
             <DialogTitle>{detailStudio?.name}</DialogTitle>
             <DialogDescription>

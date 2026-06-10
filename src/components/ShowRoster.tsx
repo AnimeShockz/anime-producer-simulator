@@ -102,6 +102,7 @@ export default function ShowRoster({
         </Button>
       </div>
 
+      {/* ScrollArea now only wraps the list; the Dialog is outside of it */}
       <ScrollArea className="max-h-[430px] pr-4">
         <div className="space-y-3 pr-4">
           {filteredManga.length === 0 ? (
@@ -128,8 +129,9 @@ export default function ShowRoster({
         </div>
       </ScrollArea>
 
+      {/* Dialog now has a high z‑index so it appears above the studio list */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md sm:max-w-lg">
+        <DialogContent className="max-w-md sm:max-w-lg z-50">
           <DialogHeader>
             <DialogTitle>{detailManga?.title}</DialogTitle>
             <DialogDescription className="space-y-1">

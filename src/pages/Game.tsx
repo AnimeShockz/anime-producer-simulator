@@ -30,7 +30,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
 import { toast as sonnerToast } from "sonner";
-import { mangaList } from "@/data/manga"; // <-- added import
+import { mangaList } from "@/data/manga";
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -49,16 +49,22 @@ type GameState = {
   rightsPurchased: boolean;
 };
 
-// Seed with first 5 manga entries
-const initialFranchises: Franchise[] = mangaList.slice(0, 5).map((manga) => ({
-  manga,
-  adapted: false,
-  review: null,
-  episodeCount: 12,
-}));
+/**
+ * Returns a fresh random selection of 5 manga entries.
+ * This runs each time the app starts (when there is no saved state).
+ */
+const getRandomFranchises = (): Franchise[] => {
+  const shuffled = [...mangaList].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 5).map((manga) => ({
+    manga,
+    adapted: false,
+    review: null,
+    episodeCount: 12,
+  }));
+};
 
 const initialState: GameState = {
-  franchises: initialFranchises,
+  franchises: getRandomFranchises(),
   currentFranchiseId: null,
   budget: "average",
   episodeCount: 12,
@@ -231,7 +237,6 @@ const Game = () => {
   const handleLoadGame = () => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (!saved) {
-      // Use Sonner's error toast (fixed)
       sonnerToast.error("No saved game found.");
       return;
     }

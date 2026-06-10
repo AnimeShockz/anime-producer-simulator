@@ -62,16 +62,13 @@ export default function StudioRoster({
     }
   }, [studios, sortOption]);
 
-  // ---------- 2️⃣ Keep only the top 10 ----------
-  const displayedStudios = useMemo(() => sortedStudios.slice(0, 10), [sortedStudios]);
-
-  // ---------- 3️⃣ Apply search ----------
+  // ---------- 2️⃣ Apply search ----------
   const filteredStudios = useMemo(() => {
-    if (!searchTerm) return displayedStudios;
-    return displayedStudios.filter((studio) =>
+    if (!searchTerm) return sortedStudios;
+    return sortedStudios.filter((studio) =>
       studio.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [displayedStudios, searchTerm]);
+  }, [sortedStudios, searchTerm]);
 
   return (
     <div className="flex flex-col h-full">

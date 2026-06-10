@@ -2,15 +2,25 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface Props {
+interface StudioSelectorProps {
   value: string;
   onChange: (value: string) => void;
   studios: { id: string; name: string }[];
 }
 
-const StudioSelector: React.FC<Props> = ({ value, onChange, studios }) => {
+const StudioSelector: React.FC<StudioSelectorProps> = ({
+  value,
+  onChange,
+  studios,
+}) => {
   return (
     <div className="flex flex-col">
       <Label className="mb-1 font-medium">Studio</Label>

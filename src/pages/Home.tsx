@@ -38,21 +38,18 @@ const Home = () => {
   const { t } = useT();
 
   const handleCreateNewGame = () => {
-    // clear all slots for a fresh start
     for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
       localStorage.removeItem(slotKey(i));
     }
     navigate("/game");
   };
 
-  const openLoadDialog = () => {
-    setIsLoadOpen(true);
-  };
+  const openLoadDialog = () => setIsLoadOpen(true);
 
   const loadFromSlot = (i: number) => {
     const data = localStorage.getItem(slotKey(i));
     if (data) {
-      localStorage.setItem("anime-producer-save", data); // main key used by Game
+      localStorage.setItem("anime-producer-save", data);
       navigate("/game");
     } else {
       alert("Slot is empty.");
@@ -63,7 +60,6 @@ const Home = () => {
   const deleteSlot = (i: number) => {
     if (confirm(`Delete save in slot ${i}? This cannot be undone.`)) {
       localStorage.removeItem(slotKey(i));
-      // force re‑render
       setIsLoadOpen(false);
       setTimeout(() => setIsLoadOpen(true), 0);
     }
@@ -134,8 +130,8 @@ const Home = () => {
                 min={0}
                 max={100}
                 step={1}
-                value={[soundVolume]}
-                onValueChange={(val) => setSoundVolume(val[0])}
+                value={soundVolume}
+                onValueChange={(val) => setSoundVolume(val)}
               />
               <p className="mt-1 text-sm text-gray-600">{soundVolume}%</p>
             </div>

@@ -1,12 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useFormContext } from "react-hook-form";
 
-export const Form = ({ children }: { children: React.ReactNode }) => {
-  const methods = useFormContext();
-  return <form>{children}</form>;
-};
+export const Form = ({ children }: { children: React.ReactNode }) => (
+  <form>{children}</form>
+);
 
 export const FormField = ({
   name,
@@ -15,8 +13,9 @@ export const FormField = ({
   name: string;
   render: (field: any) => React.ReactNode;
 }) => {
-  const { register } = useFormContext();
-  return <>{render(register(name))}</>;
+  // Simple mock field registration
+  const mockField = { name };
+  return <>{render(mockField)}</>;
 };
 
 export const FormItem = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;

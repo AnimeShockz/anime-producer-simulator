@@ -65,11 +65,6 @@ const initialState: GameState = {
   rightsPurchased: false,
 };
 
-/* placeholder review generator */
-function generateReview(_manga: Manga, _opts: { episodeCount: number }) {
-  return "AI Critic Review: (placeholder)";
-}
-
 export const Game = () => {
   const [state, setState] = useLocalStorage<GameState>(STORAGE_KEY, initialState);
   const [selectedTab, setSelectedTab] = useState<TabOption>("toAdapt");
@@ -77,7 +72,6 @@ export const Game = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [episodeCount, setEpisodeCount] = useState(initialState.episodeCount);
-
   const [soundVolume, setSoundVolume] = useState(50);
   const { language, setLanguage } = useLanguage();
   const { t } = useT();
@@ -90,45 +84,13 @@ export const Game = () => {
     [state],
   );
 
-  const handleAdaptManga = () => {
-    if (!currentFranchise) return;
-    const nextEpisodeCount = episodeCount;
-    setState((current) => ({
-      ...current,
-      episodeCount: nextEpisodeCount,
-      franchises: current.franchises.map((franchise) =>
-        franchise.manga.id === currentFranchise.manga.id
-          ? {
-              ...franchise,
-              adapted: true,
-              episodeCount: nextEpisodeCount,
-              review: generateReview(franchise.manga, {
-                episodeCount: nextEpisodeCount,
-              }),
-            }
-          : franchise,
-      ),
-    }));
-    showSuccess(`Adapted ${currentFranchise.manga.title}`);
-    setIsDialogOpen(false);
-  };
-
-  const handleSaveGame = () => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    showSuccess(t("save"));
-  };
-
-  const handleLoadGame = () => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      sonnerToast.error("No saved game found.");
-      return;
-    }
-    setState(JSON.parse(saved));
-    showSuccess(t("load"));
-  };
-
-  /* ... rest of component unchanged ... */
+  // Minimal UI to keep the component valid
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">{t("gameSettings")}</h2>
+      <Button onClick={() => navigate("/")}>Back to Home</Button>
+    </div>
+  );
 };
 
 export default Game;

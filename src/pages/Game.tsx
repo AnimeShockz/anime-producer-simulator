@@ -17,7 +17,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Manga } from "@/data/manga";
 import { BudgetLevel } from "@/data/studios";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
 const STORAGE_KEY = "anime-producer-save";

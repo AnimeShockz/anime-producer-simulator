@@ -4,16 +4,14 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 /**
- * IMPORTANT:
- *   Replace `your-repo-name` with the exact name of the GitHub repository
- *   (the part after `github.com/your‑user/`).
- *   Example: if the repo URL is https://github.com/jdoe/animator‑sim,
- *   set base to "/animator-sim/".
+ * The repository name used for the `base` path.
+ * Replace `your-repo-name` with the actual repo name if you publish to GitHub Pages.
+ * For local development a simple slash works fine.
  */
-const REPO_NAME = "your-repo-name";
+const REPO_NAME = ""; // empty string → base = "/"
 
 export default defineConfig(() => ({
-  base: `/${REPO_NAME}/`,          // <-- tells Vite to prefix all assets
+  base: REPO_NAME ? `/${REPO_NAME}/` : "/", // fallback to root for dev
   server: {
     host: "::",
     port: 8080,

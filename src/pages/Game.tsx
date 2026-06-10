@@ -17,7 +17,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Manga } from "@/data/manga";
 import { BudgetLevel } from "@/data/studios";
-import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -29,9 +28,7 @@ import {
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useT } from "@/lib/i18n";
-import { toast as sonnerToast } from "sonner";
 import { mangaList } from "@/data/manga";
-import { showSuccess } from "@/utils/toast";
 
 const STORAGE_KEY = "anime-producer-save";
 
@@ -66,29 +63,67 @@ const initialState: GameState = {
 };
 
 export const Game = () => {
+  // Use a safe local‑storage hook – it never throws.
   const [state, setState] = useLocalStorage<GameState>(STORAGE_KEY, initialState);
   const [selectedTab, setSelectedTab] = useState<TabOption>("toAdapt");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [episodeCount, setEpisodeCount] = useState(initialState.episodeCount);
-  const [soundVolume, setSoundVolume] = useState(50);
   const { language, setLanguage } = useLanguage();
   const { t } = useT();
-
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const currentFranchise = useMemo(
-    () => state.franchises.find((f) => f.manga.id === state.currentFranchiseId) ?? null,
-    [state],
-  );
-
-  // Minimal UI to keep the component valid
+  // Minimal UI – just enough to prove the page works.
   return (
-    <div className="p-4">
+    <div className="p-6 min-h-screen bg-slate-50">
       <h2 className="text-2xl font-bold mb-4">{t("gameSettings")}</h2>
-      <Button onClick={() => navigate("/")}>Back to Home</Button>
+
+      <Button onClick={() => navigate("/")}>← {t("mainMenu")}</Button>
+
+      {/* Settings dialog (kept simple) */}
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="space-y-4">
+          <DialogHeader>
+            <DialogTitle>{t("settings")}</DialogTitle>
+          </DialogHeader>
+
+          <Label className="flex items-center justify-between">
+            <span>{t("fullscreen")}</span>
+            <Switch checked={false} onCheckedChange={() => {}} />
+          </Label>
+
+          <div>
+            <Label className="block mb-2">{t("soundVolume")}</Label>
+            <Slider
+              min={0}
+              max={100}
+              step={1}
+              value={50}
+              onValueChange={() => {}}
+            />
+          </div>
+
+          <div>
+            <Label className="block mb-2">{t("language")}</Label>
+            <Select value={language} onValueChange={(v) => setLanguage(v as any)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("language")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="English">English</SelectItem>
+                <SelectItem value="Japanese">日本語</SelectItem>
+                <SelectItem value="Korean">한국어</SelectItem>
+                <SelectItem value="Chinese">中文</SelectItem>
+                <SelectItem value="Spanish">Español</SelectItem>
+                <SelectItem value="French">Français</SelectItem>
+                <SelectItem value="German">Deutsch</SelectItem>
+                <SelectItem value="Italian">Italiano</SelectItem>
+                <SelectItem value="Portuguese">Português</SelectItem>
+                <SelectItem value="Russian">Русский</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

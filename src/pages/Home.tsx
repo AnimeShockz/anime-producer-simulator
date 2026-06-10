@@ -95,22 +95,6 @@ const Home = () => {
                   onCheckedChange={handleSettingsChange}
                 />
               </Label>
-
-              <Label className="flex items-center justify-between gap-4">
-                <span className="text-sm">Mute Audio</span>
-                <Switch
-                  checked={false}
-                  onCheckedChange={handleSettingsChange}
-                />
-              </Label>
-
-              <Label className="flex items-center justify-between gap-4">
-                <span className="text-sm">Language</span>
-                <Switch
-                  checked={false}
-                  onCheckedChange={handleSettingsChange}
-                />
-              </Label>
             </div>
           </DialogContent>
         </Dialog>

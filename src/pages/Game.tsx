@@ -246,14 +246,14 @@ const getStudioFitScore = (manga: Manga, studio: Studio) => {
     if (lengthMap[studio.lengthPreference] === lengthMap[getMangaLength(manga)]) {
       score += 0.5;
     } else {
-      score -= 0.25;
+      score -= 0.5;
     }
   }
   if (studio.pacing !== "any") {
     if (pacingMap[studio.pacing] === pacingMap[getPacingPreference(manga)]) {
       score += 0.5;
     } else {
-      score -= 0.25;
+      score -= 0.5;
     }
   }
   return score;
@@ -399,144 +399,189 @@ const Game = () => {
       });
 
       setSelectedManga(null);
-      setSeason((currentSeason) => currentSeason + 1);
+      setSeason((s) => s + 1);
       setIsProducing(false);
     }, 1500);
   };
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 text-slate-950">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">Anime Producer Simulator</CardTitle>
-            <CardDescription>
-              Pick a manga from the current market roster, assign a budget, choose a studio, then wait for the AI critic review after the simulated airing run.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ShowRoster
-            mangaList={availableManga}
-            selectedManga={selectedManga}
-            season={season}
-            onSelectManga={handleMangaSelect}
-          />
-          <StudioRoster
-            studios={studios}
-            selectedStudio={selectedStudio}
-            onSelectStudio={handleStudioSelect}
-          />
-        </div>
-
-        {selectedManga && selectedStudio && (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{selectedManga.title}</CardTitle>
-                <CardDescription>
-                  {formatStatus(selectedManga)} • {selectedManga.magazine}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3 text-sm text-slate-700 md:grid-cols-2">
-                <div>
-                  <span className="font-medium text-slate-950">Popularity:</span>{" "}
-                  {selectedManga.popularity}%
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Sales:</span>{" "}
-                  {formatNumber(selectedManga.salesVolumes)} total tankobon
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Chapters:</span>{" "}
-                  {selectedManga.chapters}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Tankobon:</span>{" "}
-                  {selectedManga.tankobonVolumes}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{selectedStudio.name}</CardTitle>
-                <CardDescription>
-                  Minimum {formatBudget(selectedStudio.minBudget)} • {selectedStudio.size} studio
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3 text-sm text-slate-700 md:grid-cols-2">
-                <div>
-                  <span className="font-medium text-slate-950">Genres:</span>{" "}
-                  {formatArray(selectedStudio.genres)}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Themes:</span>{" "}
-                  {formatArray(selectedStudio.themes)}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Age groups:</span>{" "}
-                  {formatArray(selectedStudio.ageGroups)}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Length:</span>{" "}
-                  {selectedStudio.lengthPreference}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Complexity:</span>{" "}
-                  {selectedStudio.complexity}
-                </div>
-                <div>
-                  <span className="font-medium text-slate-950">Pacing:</span>{" "}
-                  {selectedStudio.pacing}
-                </div>
-                <div className="md:col-span-2">
-                  <span className="font-medium text-slate-950">Style:</span>{" "}
-                  {selectedStudio.styleDescription}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Budget</label>
-          <Select disabled={isProducing} value={selectedBudget} onValueChange={handleBudgetChange}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choose a budget" />
-            </SelectTrigger>
-            <SelectContent>
-              {budgetOrder.map((budget) => (
-                <SelectItem key={budget} value={budget}>
-                  {formatBudget(budget)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {ineligibleReason && (
-          <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            {ineligibleReason}
-          </p>
-        )}
-
-        <Button disabled={!canProduce || isProducing} className="w-full" onClick={handleProduce}>
-          {isProducing ? "Waiting for airing season..." : "Produce Anime"}
-        </Button>
-
-        {result && (
+      {/* Horizontal overflow guard for mobile */}
+      <div className="overflow-x-auto px-2">
+        <div className="mx-auto max-w-7xl space-y-6">
           <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
             <CardHeader>
-              <CardTitle>AI Critic Review</CardTitle>
-              <CardDescription>Generated after the simulated airing run.</CardDescription>
+              <CardTitle className="text-2xl font-bold">
+                Anime Producer Simulator
+              </CardTitle>
+              <CardDescription>
+                Pick a manga from the current market roster, assign a budget,
+                choose a studio, then wait for the AI critic review after the
+                simulated airing run.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Textarea value={result} readOnly className="min-h-72 resize-none" />
-            </CardContent>
           </Card>
-        )}
+
+          {/* Responsive grid: single column on <lg, two columns on lg+ */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <ShowRoster
+              mangaList={availableManga}
+              selectedManga={selectedManga}
+              season={season}
+              onSelectManga={handleMangaSelect}
+            />
+            <StudioRoster
+              studios={studios}
+              selectedStudio={selectedStudio}
+              onSelectStudio={handleStudioSelect}
+            />
+          </div>
+
+          {selectedManga && selectedStudio && (
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">{selectedManga.title}</CardTitle>
+                  <CardDescription>
+                    {formatStatus(selectedManga)} • {selectedManga.magazine}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Popularity:
+                    </span>{" "}
+                    {selectedManga.popularity}%
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Sales:
+                    </span>{" "}
+                    {formatNumber(selectedManga.salesVolumes)} total tankobon
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Chapters:
+                    </span>{" "}
+                    {selectedManga.chapters}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Tankobon:
+                    </span>{" "}
+                    {selectedManga.tankobonVolumes}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">{selectedStudio.name}</CardTitle>
+                  <CardDescription>
+                    Minimum {formatBudget(selectedStudio.minBudget)} •{" "}
+                    {selectedStudio.size} studio
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Genres:
+                    </span>{" "}
+                    {formatArray(selectedStudio.genres)}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Themes:
+                    </span>{" "}
+                    {formatArray(selectedStudio.themes)}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Age groups:
+                    </span>{" "}
+                    {formatArray(selectedStudio.ageGroups)}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Length:
+                    </span>{" "}
+                    {selectedStudio.lengthPreference}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Complexity:
+                    </span>{" "}
+                    {selectedStudio.complexity}
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-950">
+                      Pacing:
+                    </span>{" "}
+                    {selectedStudio.pacing}
+                  </div>
+                  <div className="md:col-span-2">
+                    <span className="font-medium text-slate-950">
+                      Style:
+                    </span>{" "}
+                    {selectedStudio.styleDescription}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Budget</label>
+            <Select
+              disabled={isProducing}
+              value={selectedBudget}
+              onValueChange={handleBudgetChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose a budget" />
+              </SelectTrigger>
+              <SelectContent>
+                {budgetOrder.map((budget) => (
+                  <SelectItem key={budget} value={budget}>
+                    {formatBudget(budget)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {ineligibleReason && (
+            <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {ineligibleReason}
+            </p>
+          )}
+
+          <Button
+            disabled={!canProduce || isProducing}
+            className="w-full"
+            onClick={handleProduce}
+          >
+            {isProducing ? "Waiting for airing season..." : "Produce Anime"}
+          </Button>
+
+          {result && (
+            <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle>AI Critic Review</CardTitle>
+                <CardDescription>
+                  Generated after the simulated airing run.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={result}
+                  readOnly
+                  className="min-h-72 resize-none"
+                />
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

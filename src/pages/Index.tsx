@@ -4,17 +4,14 @@ const generateCriticReview = (manga: Manga, studio: Studio, budget: BudgetLevel)
   const budgetNum = budgetValue[budget];
   const studioMinBudgetNum = budgetValue[studio.minBudget];
 
-  // Budget‑vs‑length penalty: longer series with a low budget look/sound worse
+  // Length‑vs‑budget penalty (same as before)
   const lengthPenalty = (() => {
-    const length = getMangaLength(manga); // short / medium / long
+    const length = getMangaLength(manga);
     if (budgetNum <= budgetValue["low"]) {
-      // low budgets struggle with longer works
       if (length === "long") return -2;
       if (length === "medium") return -1;
     }
-    if (budgetNum === budgetValue["average"]) {
-      if (length === "long") return -1;
-    }
+    if (budgetNum === budgetValue["average"] && length === "long") return -1;
     return 0;
   })();
 
@@ -35,7 +32,7 @@ const generateCriticReview = (manga: Manga, studio: Studio, budget: BudgetLevel)
   if (manga.status === "finished") { score += 1; } else if (manga.releaseFrequency === "weekly") { score += 0.5; } else { score -= 0.25; }
   score += getStudioFitScore(manga, studio);
   score += budgetNum >= 5 ? 0.75 : budgetNum <= 2 ? -0.75 : 0.25;
-  score += lengthPenalty; // <-- apply the new penalty
+  score += lengthPenalty;
 
   const finalScore = Math.max(0, Math.min(10, Math.round(score)));
   const ratingMap: Record<number, string> = {
@@ -51,6 +48,11 @@ const generateCriticReview = (manga: Manga, studio: Studio, budget: BudgetLevel)
   const lengthNote = lengthPenalty < 0
     ? "Because the series is long relative to the modest budget, the animation quality and sound design suffer, making the overall experience feel thin."
     : "The chosen budget comfortably supports the series length, allowing solid visuals and audio.";
+
+  // Extra note for Triangle Staff cult classic
+  const triangleCultNote = studio.id === "triangle-staff" && score >= 5
+    ? "\n\n⚡️ Cult Classic Alert: Despite the studio's notorious reputation, this perfect existential slice‑of‑life match turned the project into a cult phenomenon."
+    : "";
 
   return [
     `AI Critic Review: ${rating} (${finalScore}/10)`,
@@ -70,6 +72,6 @@ const generateCriticReview = (manga: Manga, studio: Studio, budget: BudgetLevel)
           : finalScore >= 3
             ? "A disappointing adaptation. The studio choice, budget pressure, or format mismatch left too much of the manga's appeal behind."
             : "A troubled adaptation. Critics viewed it as a poor pairing between source material, studio strengths, and production resources."
-    }`,
+    }${triangleCultNote}`,
   ].join("\n");
 };

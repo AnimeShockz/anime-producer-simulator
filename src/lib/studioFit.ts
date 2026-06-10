@@ -54,21 +54,19 @@ export function getStudioFitScore(manga: Manga, studio: Studio): number {
     // Desired style for Triangle Staff:
     //   - Slice‑of‑life genre
     //   - Psychological theme
-    //   - Slow pacing
-    //   - Dark/moody tone (we treat this as the presence of the "psychological" theme)
+    //   - Slow pacing (moody/dark tone is represented by the psychological theme)
     const isSliceOfLife = mangaGenres.includes("slice of life");
     const isPsychological = mangaThemes.includes("psychological");
     const isSlow = mangaPacing === "slow";
 
     const meetsAll = isSliceOfLife && isPsychological && isSlow;
 
-    // If it doesn’t meet the exact combination, heavily penalise the fit.
     if (!meetsAll) {
-      // A large negative value ensures the overall critic score drops dramatically.
+      // Heavy penalty when the style does not match.
       score -= 5;
     } else {
-      // When it does match, give a modest bonus.
-      score += 1;
+      // Strong boost – the show becomes a cult classic.
+      score += 5;
     }
   }
 

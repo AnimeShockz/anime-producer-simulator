@@ -3,14 +3,19 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
-const ToggleGroup = React.forwardRef(
+export type ToggleGroupProps = {
+  asChild?: boolean;
+  children: React.ReactNode;
+} & React.ComponentPropsWithoutRef<"div">;
+
+export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
   ({ asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "div";
     return (
       <Comp ref={ref} {...props}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child, child.props);
+            return React.cloneElement(child, {});
           }
           return child;
         })}
@@ -18,17 +23,14 @@ const ToggleGroup = React.forwardRef(
     );
   }
 );
-ToggleGroup.displayName = "ToggleGroup";
 
-ToggleGroup.Item = React.forwardRef(({ ...props }, ref) => {
-  return (
-    <Slot ref={ref}>
-      {({ ...toggleGroupItem }) => (
-        <button type="button" {...toggleGroupItem} {...props} ref={ref} />
-      )}
-    </Slot>
-  );
-});
-ToggleGroup.Item.displayName = "ToggleGroup.Item";
+ToggleGroup.Item = React.forwardRef<HTMLButtonElement, { value?: string }>(
+  ({ value, ...props }, ref) => {
+    return (
+      <Slot as="button" ref={ref} {...props} />
+    );
+  }
+);
 
+export default ToggleGroup;
 export { ToggleGroup, ToggleGroup.Item };

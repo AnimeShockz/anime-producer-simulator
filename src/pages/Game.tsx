@@ -69,7 +69,7 @@ const Game: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-1 flex flex-col">
-        <Tabs defaultValue="yet-to-adapt">
+        <Tabs>
           <TabsList>
             <TabsTrigger value="yet-to-adapt">Yet to be Adapted</TabsTrigger>
             <TabsTrigger value="adapted-by-you">Adapted by You</TabsTrigger>
@@ -78,7 +78,7 @@ const Game: React.FC = () => {
 
           <div className="flex flex-1 gap-4 p-4">
             <div className="flex-1">
-              <TabsContent>
+              <TabsContent value="yet-to-adapt">
                 <ShowRoster
                   mangaList={yetToBeAdapted}
                   selectedManga={selectedManga}
@@ -86,14 +86,15 @@ const Game: React.FC = () => {
                   onSelectManga={setSelectedManga}
                 />
               </TabsContent>
-              <TabsContent>
-                <ShowRoster                  mangaList={adaptedByUser}
+              <TabsContent value="adapted-by-you">
+                <ShowRoster
+                  mangaList={adaptedByUser}
                   selectedManga={selectedManga}
                   season={1}
                   onSelectManga={setSelectedManga}
                 />
               </TabsContent>
-              <TabsContent>
+              <TabsContent value="all-adapted">
                 <ShowRoster
                   mangaList={allAdapted}
                   selectedManga={selectedManga}

@@ -68,60 +68,62 @@ const Game: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <Tabs className="flex-1 flex flex-col">
-        <TabsList>
-          <TabsTrigger value="yet-to-adapt">Yet to be Adapted</TabsTrigger>
-          <TabsTrigger value="adapted-by-you">Adapted by You</TabsTrigger>
-          <TabsTrigger value="all-adapted">All Adapted Manga</TabsTrigger>
-        </TabsList>
+      <div className="flex-1 flex flex-col">
+        <Tabs defaultValue="yet-to-adapt">
+          <TabsList>
+            <TabsTrigger value="yet-to-adapt">Yet to be Adapted</TabsTrigger>
+            <TabsTrigger value="adapted-by-you">Adapted by You</TabsTrigger>
+            <TabsTrigger value="all-adapted">All Adapted Manga</TabsTrigger>
+          </TabsList>
 
-        <div className="flex flex-1 gap-4 p-4">
-          <div className="flex-1">
-            <TabsContent>
-              <ShowRoster
-                mangaList={yetToBeAdapted}
-                selectedManga={selectedManga}
-                season={1}
-                onSelectManga={setSelectedManga}
-              />
-            </TabsContent>
-            <TabsContent>
-              <ShowRoster
-                mangaList={adaptedByUser}
-                selectedManga={selectedManga}
-                season={1}
-                onSelectManga={setSelectedManga}
-              />
-            </TabsContent>
-            <TabsContent>
-              <ShowRoster
-                mangaList={allAdapted}
-                selectedManga={selectedManga}
-                season={1}
-                onSelectManga={setSelectedManga}
-              />
-            </TabsContent>
-          </div>
+          <div className="flex flex-1 gap-4 p-4">
+            <div className="flex-1">
+              <TabsContent>
+                <ShowRoster
+                  mangaList={yetToBeAdapted}
+                  selectedManga={selectedManga}
+                  season={1}
+                  onSelectManga={setSelectedManga}
+                />
+              </TabsContent>
+              <TabsContent>
+                <ShowRoster                  mangaList={adaptedByUser}
+                  selectedManga={selectedManga}
+                  season={1}
+                  onSelectManga={setSelectedManga}
+                />
+              </TabsContent>
+              <TabsContent>
+                <ShowRoster
+                  mangaList={allAdapted}
+                  selectedManga={selectedManga}
+                  season={1}
+                  onSelectManga={setSelectedManga}
+                />
+              </TabsContent>
+            </div>
 
-          <div className="w-80 flex flex-col gap-4">
-            <StudioRoster
-              studios={studios}
-              selectedStudio={selectedStudio}
-              onSelectStudio={setSelectedStudio}
-            />
-            <div className="space-y-4">
-              <BudgetSelector value={selectedBudget} onChange={setSelectedBudget} />
-              <StudioSelector                value={selectedStudio?.id ?? ""}
-                onChange={(id) =>
-                  setSelectedStudio(studios.find((s) => s.id === id) ?? null)
-                }
-                studios={studios.map((s) => ({ id: s.id, name: s.name }))}
+            <div className="w-80 flex flex-col gap-4">
+              <StudioRoster
+                studios={studios}
+                selectedStudio={selectedStudio}
+                onSelectStudio={setSelectedStudio}
               />
-              <ProduceButton isEligible={!!isEligible} onProduce={handleProduce} />
+              <div className="space-y-4">
+                <BudgetSelector value={selectedBudget} onChange={setSelectedBudget} />
+                <StudioSelector
+                  value={selectedStudio?.id ?? ""}
+                  onChange={(id) =>
+                    setSelectedStudio(studios.find((s) => s.id === id) ?? null)
+                  }
+                  studios={studios.map((s) => ({ id: s.id, name: s.name }))}
+                />
+                <ProduceButton isEligible={!!isEligible} onProduce={handleProduce} />
+              </div>
             </div>
           </div>
         </div>
-      </Tabs>
+      </div>
     </div>
   );
 };

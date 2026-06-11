@@ -1,45 +1,34 @@
 "use client";
 
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 
-export const ToggleGroup = ({
-  type = "single",
-  value,
-  onValueChange,
-  children,
-}: {
-  type?: "single" | "multiple";
-  value?: string | string[];
-  onValueChange?: (val: string | string[]) => void;
-  children: React.ReactNode;
-}) => {
-  const handleClick = (val: string) => {
-    if (type === "single") {
-      onValueChange?.(val);
-    } else {
-      const arr = Array.isArray(value) ? [...value] : [];
-      if (arr.includes(val)) {
-        onValueChange?.(arr.filter((v) => v !== val));
-      } else {
-        onValueChange?.([...arr, val]);
-      }
-    }
-  };
+const ToggleGroup = React.forwardRef(
+  ({ asChild = false, children, ...props }, ref) => {
+    const Comp = asChild ? Slot : "div";
+    return (
+      <Comp ref={ref} {...props}>
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, child.props);
+          }
+          return child;
+        })}
+      </Comp>
+    );
+  }
+);
+ToggleGroup.displayName = "ToggleGroup";
+
+ToggleGroup.Item = React.forwardRef(({ ...props }, ref) => {
   return (
-    <div className="flex gap-2">
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child)
-          ? React.cloneElement(child, { onClick: () => handleClick(child.props.value) })
-          : child,
+    <Slot ref={ref}>
+      {({ ...toggleGroupItem }) => (
+        <button type="button" {...toggleGroupItem} {...props} ref={ref} />
       )}
-    </div>
+    </Slot>
   );
-};
+});
+ToggleGroup.Item.displayName = "ToggleGroup.Item";
 
-export const ToggleGroupItem = ({
-  value,
-  children,
-}: {
-  value: string;
-  children: React.ReactNode;
-}) => <button className="px-3 py-1 border rounded">{children}</button>;
+export { ToggleGroup, ToggleGroup.Item };

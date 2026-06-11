@@ -24,16 +24,14 @@ const Game: React.FC = () => {
   const { toast } = useToast();
 
   const [selectedManga, setSelectedManga] = useState<Manga | null>(null);
-  const [selectedStudio, setSelectedStudio] = useState<anga | null>(null);
+  const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
   const [selectedBudget, setSelectedBudget] = useState<string>("");
   const [language, setLanguage] = useState<string>("English");
   const [volume, setVolume] = useState<number>(50);
   const [userAdaptedManga, setUserAdaptedManga] = useState<string[]>([]);
 
-  // Track which manga have been adapted (in a real app, this would come from game state)
   const adaptedMangaIds = userAdaptedManga;
 
-  // Categorize manga
   const yetToBeAdapted = useMemo(() => 
     mangaList.filter(m => !adaptedMangaIds.includes(m.id)),
     [adaptedMangaIds]
@@ -44,7 +42,6 @@ const Game: React.FC = () => {
     [adaptedMangaIds]
   );
   
-  // For demo, "all adapted" includes user-adapted ones
   const allAdapted = adaptedByUser;
 
   const isEligible =
@@ -57,7 +54,6 @@ const Game: React.FC = () => {
   const handleProduce = () => {
     if (!selectedManga || !selectedStudio || !selectedBudget) return;
 
-    // Track this manga as adapted by user
     setUserAdaptedManga(prev => [...prev, selectedManga.id]);
 
     showSuccess(
@@ -72,19 +68,16 @@ const Game: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Top-level tabs for Manga categories */}
-      <Tabs defaultValue="yet-to-adapt" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
+      <Tabs className="flex-1 flex flex-col">
+        <TabsList>
           <TabsTrigger value="yet-to-adapt">Yet to be Adapted</TabsTrigger>
           <TabsTrigger value="adapted-by-you">Adapted by You</TabsTrigger>
           <TabsTrigger value="all-adapted">All Adapted Manga</TabsTrigger>
         </TabsList>
 
-        {/* Manga content - will be in left column */}
         <div className="flex flex-1 gap-4 p-4">
-          {/* Left: Manga tabs content */}
           <div className="flex-1">
-            <TabsContent value="yet-to-adapt" className="h-full">
+            <TabsContent>
               <ShowRoster
                 mangaList={yetToBeAdapted}
                 selectedManga={selectedManga}
@@ -92,8 +85,7 @@ const Game: React.FC = () => {
                 onSelectManga={setSelectedManga}
               />
             </TabsContent>
-
-            <TabsContent value="adapted-by-you" className="h-full">
+            <TabsContent>
               <ShowRoster
                 mangaList={adaptedByUser}
                 selectedManga={selectedManga}
@@ -101,8 +93,7 @@ const Game: React.FC = () => {
                 onSelectManga={setSelectedManga}
               />
             </TabsContent>
-
-            <TabsContent value="all-adapted" className="h-full">
+            <TabsContent>
               <ShowRoster
                 mangaList={allAdapted}
                 selectedManga={selectedManga}
@@ -112,18 +103,15 @@ const Game: React.FC = () => {
             </TabsContent>
           </div>
 
-          {/* Right: Studio and Settings */}
           <div className="w-80 flex flex-col gap-4">
             <StudioRoster
               studios={studios}
               selectedStudio={selectedStudio}
               onSelectStudio={setSelectedStudio}
             />
-            
             <div className="space-y-4">
               <BudgetSelector value={selectedBudget} onChange={setSelectedBudget} />
-              <StudioSelector
-                value={selectedStudio?.id ?? ""}
+              <StudioSelector                value={selectedStudio?.id ?? ""}
                 onChange={(id) =>
                   setSelectedStudio(studios.find((s) => s.id === id) ?? null)
                 }
